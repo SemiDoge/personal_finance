@@ -5,3 +5,4 @@ bank/__pycache__/
 bank/scraper.py
 
 *.json
+*.csv
