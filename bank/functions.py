@@ -9,6 +9,7 @@ def extract_timestamp(ts: str):
     return datetime.datetime(int(year), int(month), int(day))
 
 def categorize(transactionTitle: str):
+    #TODO: Consider making the search strings for the different categories somehow factorable to a config file, possibly a .yaml?
     if transactionTitle.find('RECURRING') != -1:
        return "Subscriptions"
 
