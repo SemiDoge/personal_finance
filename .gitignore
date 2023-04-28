@@ -1,0 +1,7 @@
+.venv/
+.vscode/
+scrapes/
+bank/__pycache__/
+bank/scraper.py
+
+*.json
