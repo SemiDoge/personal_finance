@@ -1,5 +1,14 @@
-{{def(data, colours, month)}}
+{{def(data, colours, month, verbose)}}
 <!DOCTYPE document SYSTEM "rml.dtd">
+
+{{script}}
+    import datetime as dt
+    today = dt.datetime.today()
+    today = today.strftime("%b %d/%Y")
+
+    idx = len(data['monthToMonthExpenditure'])
+    period = data['monthToMonthExpenditure'][idx - 1]['category']
+{{endscript}}
 <document filename="x.pdf">
     <template>
         <pageTemplate id="main">
@@ -10,21 +19,33 @@
                 <setFont name="Helvetica" size="24"/>
                 <drawString x="45" y="775" >Transaction Insights</drawString>
                 <setFont name="Helvetica" size="14"/>
-                {{script}}
-                    import datetime as dt
-                    today = dt.datetime.today()
-                    today = today.strftime("%b %d/%Y")
-                {{endscript}}
                 <fill color="{{colours['stdFG']}}"/>
                 <rect x="10" y="6" width="575" height="20" fill="yes" stroke="no"/> 
                 <fill color="{{colours['bannerFG']}}"/>
                 <drawString x="500" y="10">{{today}}</drawString>
             </pageGraphics>
             <frame id="headline" x1="28" y1="700" width="400" height="20" showBoundary="0"/>
-            <frame id="headlineContent" x1="28" y1="575" width="400" height="100" showBoundary="0"/>
-            <frame id="monthlyContent" x1="28" y1="500" width="560" height="100" showBoundary="0"/>
+            <frame id="periodFrame" x1="28" y1="675" width="400" height="20" showBoundary="0"/>
+            <frame id="headlineContent" x1="28" y1="595" width="400" height="70" showBoundary="0"/>
+            <frame id="monthlyContent" x1="28" y1="475" width="555" height="100" showBoundary="0"/>
             <frame id="spendingPieChart" x1="355" y1="170" width="236" height="125" showBoundary="0"/>
             <frame id="spendingTable" x1="28" y1="40" width="325" height="350" showBoundary="0"/>
+        </pageTemplate>
+        <pageTemplate id="transactions">
+            <pageGraphics>
+                <fill color="{{colours['bannerBG']}}"/>
+                <rect x="10" y="735" width="575" height="70" fill="yes" stroke="no"/> 
+                <fill color="{{colours['bannerFG']}}"/>
+                <setFont name="Helvetica" size="24"/>
+                <drawString x="45" y="775" >Transaction Insights</drawString>
+                <setFont name="Helvetica" size="14"/>
+                <fill color="{{colours['stdFG']}}"/>
+                <rect x="10" y="6" width="575" height="20" fill="yes" stroke="no"/> 
+                <fill color="{{colours['bannerFG']}}"/>
+                <drawString x="500" y="10">{{today}}</drawString>
+            </pageGraphics>
+            <frame id="headline" x1="28" y1="700" width="400" height="20" showBoundary="0"/>
+            <frame id="transactionTable" x1="28" y1="55" width="555" height="630" showBoundary="0"/>
         </pageTemplate>
     </template>
     <stylesheet>
@@ -42,30 +63,50 @@
         <blockTableStyle id="tblCatSpend">
             <blockFont name="Courier-Bold" start="1,1" stop="-1,-1"/>
             <blockAlignment value="right" start="0,1" stop="0,-1"/>
+            <blockAlignment value="center" start="0,0" stop="1,0"/>
             <blockAlignment value="center" start="1,1" stop="-1,-1"/>
             <blockBackground colorName="{{colours['bannerBG']}}" start="0,0" stop="-1,0"/>
             <blockFont name="Helvetica" size="12" start="0,0" stop="-1,0"/>
             <blockFont name="Helvetica-Bold" start="0,1" stop="0,-1"/>
             <blockTextColor colorName="white" start="0,0" stop="-1,0"/>
+            <roundedCorners radii="12"/>
+            <blockBackground colorsByRow="{{colours['tblBG']}};{{colours['tblBGAlt']}}" start="0,1" stop="-1,-1"/>
+        </blockTableStyle>
+        <blockTableStyle id="tblTransaction">
+            <blockFont name="Courier-Bold" start="1,1" stop="1,-1"/>
+            <blockAlignment value="right" start="0,1" stop="0,-1"/>
+            <blockAlignment value="center" start="0,0" stop="1,0"/>
+            <blockAlignment value="center" start="1,1" stop="-1,-1"/>
+            <blockBackground colorName="{{colours['bannerBG']}}" start="0,0" stop="-1,0"/>
+            <blockFont name="Helvetica" size="12" start="0,0" stop="-1,0"/>
+            <blockFont name="Helvetica-Bold" start="0,1" stop="0,-1"/>
+            <blockTextColor colorName="white" start="0,0" stop="-1,0"/>
+            <roundedCorners radii="12"/>
+            <blockBackground colorsByRow="{{colours['tblBG']}};{{colours['tblBGAlt']}}" start="0,1" stop="-1,-1"/>
         </blockTableStyle>
     </stylesheet>
     <story>
         <keepInFrame frame="headline">
             <h1 fontSize="24">Top-line spending figures:</h1>
         </keepInFrame>
+        <keepInFrame>
+            <para style="textstyle1">
+                Period up to {{period}}
+            </para>
+        </keepInFrame>
         <keepInFrame frame="headlineContent">
             <blockTable style="tblTopline">
             <tr>
                 <td>Money spent YTD</td>
-                <td>${{"{:,}".format(abs(data['totMoneyOut']))}}</td>
+                <td leftPadding="15" align="DECIMAL">${{"{:,}".format(abs(data['totMoneyOut']))}}</td>
             </tr>
             <tr>
                 <td>Money recieved YTD</td>
-                <td>${{"{:,}".format(data['totMoneyIn'])}}</td>
+                <td leftPadding="15" align="DECIMAL">${{"{:,}".format(data['totMoneyIn'])}}</td>
             </tr>
             <tr>
                 <td>Net Money YTD</td>
-                <td>${{"{:,}".format(data['totDifference'])}}</td>
+                <td leftPadding="15" align="DECIMAL">${{"{:,}".format(data['totDifference'])}}</td>
             </tr>
             </blockTable>
             
@@ -94,19 +135,45 @@
                 {{for category in data['categoryExpenditure']}}
                     <tr>
                         <td>{{category['category']}}</td>
-                        <td>{{"{:,}".format(category['categoryMoneyOut'])}}</td>
-                        <td>{{"{:,}".format(category['categoryMoneyIn'])}}</td>
-                        <td>{{"{:,}".format(category['categoryDifference'])}}</td>
+                        <td>{{"{:,.2f}".format(category['categoryMoneyOut'])}}</td>
+                        <td>{{"{:,.2f}".format(category['categoryMoneyIn'])}}</td>
+                        <td>{{"{:,.2f}".format(category['categoryDifference'])}}</td>
                     </tr>
                 {{endfor}}
 
                 <tr>
                     <td>Total/YTD</td>
-                    <td>{{"{:,}".format(data['totMoneyOut'])}}</td>
-                    <td>{{"{:,}".format(data['totMoneyIn'])}}</td>
-                    <td>{{"{:,}".format(data['totDifference'])}}</td>
+                    <td>{{"{:,.2f}".format(data['totMoneyOut'])}}</td>
+                    <td>{{"{:,.2f}".format(data['totMoneyIn'])}}</td>
+                    <td>{{"{:,.2f}".format(data['totDifference'])}}</td>
                 </tr>
             </blockTable>
         </keepInFrame>
-        </story>
-    </document>
+        <!-- This branch will display all of the transactions -->
+        {{if verbose == True:}}
+        <switchTemplate name="transactions"/>
+        <keepInFrame frame="headline">
+            <h1>All transactions in period</h1>
+        </keepInFrame>
+        <keepInFrame frame="transactionTable">
+            <blockTable style="tblTransaction">
+                <tr>
+                    <td>Date</td>
+                    <td>Amount</td>
+                    <td>Category</td>
+                    <td>Title</td>
+                </tr>
+
+                {{for i in range(len(data['transactions']))}}
+                    <tr>
+                        <td>{{data['transactions'][i]['transactionTimestamp'].strftime("%b %d %Y")}}</td>
+                        <td leftPadding="10" align="DECIMAL">{{"{:,.2f}".format(data['transactions'][i]['transactionAmount'])}}</td>
+                        <td leftPadding="15">{{data['transactions'][i]['transactionCategory']}}</td>
+                        <td align="LEFT">{{data['transactions'][i]['transactionTitle']}}</td>
+                    </tr>
+                {{endfor}}
+            </blockTable>
+        </keepInFrame>
+        {{endif}}
+    </story>
+</document>

@@ -10,11 +10,20 @@ from rlextra.rml2pdf import rml2pdf
 import preppy
 import datetime as dt
 
-def commit_to_pdf(data, outfile):
+def commit_to_pdf(data, outfile, statement = None):
+
+    verbose = False
+
+    if statement != None:
+        verbose = True
+        data['transactions'] = statement
+
     colours = {
         "stdFG": "#000000",
-        "bannerBG": "#2626A6",
-        "bannerFG": "#E8E8E8"
+        "bannerBG": "#0173B5",
+        "bannerFG": "#E8E8E8",
+        "tblBG": "#F5F5DC",
+        "tblBGAlt": "#E1C699"
     }
 
     month = {
@@ -29,7 +38,7 @@ def commit_to_pdf(data, outfile):
     month['biggestMonthSpend'] = abs(bgm['categoryMoneyOut'])
 
     template = preppy.getModule('bank/insight_report.prep')
-    rmlText = template.get(data, colours, month)
+    rmlText = template.get(data, colours, month, verbose)
 
     rml2pdf.go(rmlText, outputFileName=outfile)
 

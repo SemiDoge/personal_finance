@@ -49,7 +49,7 @@ def filter_categories(statement):
     category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Steam/Games"])
     category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Amazon/Others"])
     category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Groceries"])
-    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "FastFood/Others"])
+    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Fast Food"])
     category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Keyboards"])
     category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Online/Others"])
     category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Others"])
@@ -87,7 +87,7 @@ def filter_months(statement):
     
     return out
 
-def generate_insights(statement: list):
+def generate_insights(statement: list[dict]):
     out = {
         "totMoneyOut": 0.0,
         "totMoneyIn": 0.0,
@@ -106,16 +106,20 @@ def generate_insights(statement: list):
     return out
 
 
-@click.command(help='Takes a BMO generated transaction .csv file and interprets that data to provide insights. Creates a viewable PDF with spending insights contained within.')
-@click.option('-s', '--statement', prompt=True, help='Bank statement csv filename')
-@click.option('-p', '--print-json', help='Prints pretty JSON (alternate to PDF)', default=False, is_flag=True, callback=print_json)
-def main(statement: str, print_json: bool):
+@click.command(help='Takes a BMO generated transaction .csv file and interprets that data to provide insights in the form of a viewable PDF.')
+@click.option('-s', '--statement', prompt=True, help='Bank statement csv filename.')
+@click.option('-v', '--verbose', is_flag=True, help='Includes itemized transactions along with insights PDF.')
+@click.option('-p', '--print-json', help='Prints pretty JSON (alternate to PDF).', default=False, is_flag=True, callback=print_json)
+def main(statement: str, print_json: bool, verbose: bool):
     statement = statement.replace(' ','')
     statement_obj = slurp_statement_csv(statement, False)
     insights_obj = generate_insights(statement_obj)
 
     outfile = statement.replace('.csv','.pdf')
-    commit_to_pdf(insights_obj, outfile)
+    if verbose == True:
+        commit_to_pdf(insights_obj, outfile, statement_obj)
+    else:
+        commit_to_pdf(insights_obj, outfile)
 
     print(f"Saved insight to {outfile}")
     webbrowser.open(outfile)
