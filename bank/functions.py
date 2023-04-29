@@ -1,5 +1,6 @@
 import csv
 import datetime
+import re
 
 def extract_timestamp(ts: str):
     year = ts[0:4]
@@ -50,7 +51,7 @@ def categorize(transactionTitle: str):
     for str in fast_food_search_strings:
         i = transactionTitle.find(str)
         if i != -1:
-            return "FastFood/Others"
+            return "Fast Food"
 
     keyboards_search_strings = ["KEYBOARDS", "KEEB", "TYPIST", "RINGER"]
     for str in keyboards_search_strings:
@@ -77,8 +78,26 @@ def slurp_statement_csv(file: str, bForPrint: bool):
 
         for row in reader:
             if bForPrint == True:
-                records.append(dict(account = row[0], transactionType=row[1], transactionTimestamp=extract_timestamp(row[2]).strftime('%Y-%m-%d'), transactionAmount=float(row[3]), transactionCategory=categorize(row[4]), transactionTitle=row[4].rstrip()))
+                records.append(
+                    dict (
+                            account = row[0].replace("'",""), 
+                            transactionType=row[1], 
+                            transactionTimestamp=extract_timestamp(row[2]).strftime('%Y-%m-%d'), 
+                            transactionAmount=float(row[3]), 
+                            transactionCategory=categorize(row[4]), 
+                            transactionTitle=re.sub(r"\s{3,}"," ", row[4].rstrip())
+                        )
+                    )
             else:
-                records.append(dict(account = row[0], transactionType=row[1], transactionTimestamp=extract_timestamp(row[2]), transactionAmount=float(row[3]), transactionCategory=categorize(row[4]), transactionTitle=row[4].rstrip()))
+                records.append(
+                    dict (
+                        account = row[0].replace("'",""),
+                        transactionType=row[1],
+                        transactionTimestamp=extract_timestamp(row[2]),
+                        transactionAmount=float(row[3]),
+                        transactionCategory=categorize(row[4]),
+                        transactionTitle=re.sub(r"\s{3,}"," ", row[4].rstrip())
+                    )
+                )
 
     return records
