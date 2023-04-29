@@ -45,7 +45,7 @@
                 <drawString x="500" y="10">{{today}}</drawString>
             </pageGraphics>
             <frame id="headline" x1="28" y1="700" width="400" height="20" showBoundary="0"/>
-            <frame id="transactionTable" x1="28" y1="55" width="555" height="630" showBoundary="0"/>
+            <frame id="transactionTable" x1="28" y1="55" width="555" height="630" showBoundary="1"/>
         </pageTemplate>
     </template>
     <stylesheet>
@@ -69,7 +69,7 @@
             <blockFont name="Helvetica" size="12" start="0,0" stop="-1,0"/>
             <blockFont name="Helvetica-Bold" start="0,1" stop="0,-1"/>
             <blockTextColor colorName="white" start="0,0" stop="-1,0"/>
-            <roundedCorners radii="12"/>
+            <roundedCorners radii="12,6,12,12"/>
             <blockBackground colorsByRow="{{colours['tblBG']}};{{colours['tblBGAlt']}}" start="0,1" stop="-1,-1"/>
         </blockTableStyle>
         <blockTableStyle id="tblTransaction">
@@ -81,7 +81,7 @@
             <blockFont name="Helvetica" size="12" start="0,0" stop="-1,0"/>
             <blockFont name="Helvetica-Bold" start="0,1" stop="0,-1"/>
             <blockTextColor colorName="white" start="0,0" stop="-1,0"/>
-            <roundedCorners radii="12"/>
+            <roundedCorners radii="12,12,6,6"/>
             <blockBackground colorsByRow="{{colours['tblBG']}};{{colours['tblBGAlt']}}" start="0,1" stop="-1,-1"/>
         </blockTableStyle>
     </stylesheet>
@@ -155,6 +155,17 @@
         <keepInFrame frame="headline">
             <h1>All transactions in period</h1>
         </keepInFrame>
+        <!-- This script calculates how to display transaction data into page spanning tables -->
+        {{script}} 
+            import math
+
+            totTrans = len(data['transactions'])
+            recordsPerPage = 25
+            numOfTbl = math.ceil(totTrans/recordsPerPage)
+            print(totTrans)
+            print(recordsPerPage)
+            print(numOfTbl)
+        {{endscript}} 
         <keepInFrame frame="transactionTable">
             <blockTable style="tblTransaction">
                 <tr>
@@ -174,6 +185,18 @@
                 {{endfor}}
             </blockTable>
         </keepInFrame>
+        <nextPage />
+        <keepInFrame frame="transactionTable">
+            <blockTable style="tblTransaction">
+                <tr>
+                    <td>Date</td>
+                    <td>Amount</td>
+                    <td>Category</td>
+                    <td>Title</td>
+                </tr>
+            </blockTable>
+        </keepInFrame>
+         
         {{endif}}
     </story>
 </document>
