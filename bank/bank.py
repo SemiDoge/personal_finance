@@ -106,17 +106,17 @@ def generate_insights(statement: list):
     return out
 
 
-@click.command(help='Takes a BMO generated transaction .csv file and interprets that data to provide insights. Creates a ')
+@click.command(help='Takes a BMO generated transaction .csv file and interprets that data to provide insights. Creates a viewable PDF with spending insights contained within.')
 @click.option('-s', '--statement', prompt=True, help='Bank statement csv filename')
-@click.option('-p', '--print-json', help='Prints pretty JSON', default=False, is_flag=True, callback=print_json)
+@click.option('-p', '--print-json', help='Prints pretty JSON (alternate to PDF)', default=False, is_flag=True, callback=print_json)
 def main(statement: str, print_json: bool):
     statement = statement.replace(' ','')
     statement_obj = slurp_statement_csv(statement, False)
-
     insights_obj = generate_insights(statement_obj)
 
     outfile = statement.replace('.csv','.pdf')
     commit_to_pdf(insights_obj, outfile)
+
     print(f"Saved insight to {outfile}")
     webbrowser.open(outfile)
 

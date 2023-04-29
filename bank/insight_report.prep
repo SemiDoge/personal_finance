@@ -57,22 +57,22 @@
             <blockTable style="tblTopline">
             <tr>
                 <td>Money spent YTD</td>
-                <td>${{abs(data['totMoneyOut'])}}</td>
+                <td>${{"{:,}".format(abs(data['totMoneyOut']))}}</td>
             </tr>
             <tr>
                 <td>Money recieved YTD</td>
-                <td>${{data['totMoneyIn']}}</td>
+                <td>${{"{:,}".format(data['totMoneyIn'])}}</td>
             </tr>
             <tr>
                 <td>Net Money YTD</td>
-                <td>${{data['totDifference']}}</td>
+                <td>${{"{:,}".format(data['totDifference'])}}</td>
             </tr>
             </blockTable>
             
         </keepInFrame>
         <keepInFrame frame="monthlyContent">
             <para style="textstyle1">
-                You spent an average of ${{month['avgPM']}} per month. Your most expensive month was {{month['biggestMonth'].strftime("%B")}} where you spent ${{month['biggestMonthSpend']}}.
+                You spent an average of ${{"{:,}".format(month['avgPM'])}} per month. Your most expensive month was {{month['biggestMonth'].strftime("%B")}} where you spent ${{"{:,}".format(month['biggestMonthSpend'])}}.
             </para>
         </keepInFrame>
         <keepInFrame frame="spendingPieChart">
@@ -94,17 +94,17 @@
                 {{for category in data['categoryExpenditure']}}
                     <tr>
                         <td>{{category['category']}}</td>
-                        <td>{{category['categoryMoneyOut']}}</td>
-                        <td>{{category['categoryMoneyIn']}}</td>
-                        <td>{{category['categoryDifference']}}</td>
+                        <td>{{"{:,}".format(category['categoryMoneyOut'])}}</td>
+                        <td>{{"{:,}".format(category['categoryMoneyIn'])}}</td>
+                        <td>{{"{:,}".format(category['categoryDifference'])}}</td>
                     </tr>
                 {{endfor}}
 
                 <tr>
                     <td>Total/YTD</td>
-                    <td>{{data['totMoneyOut']}}</td>
-                    <td>{{data['totMoneyIn']}}</td>
-                    <td>{{data['totDifference']}}</td>
+                    <td>{{"{:,}".format(data['totMoneyOut'])}}</td>
+                    <td>{{"{:,}".format(data['totMoneyIn'])}}</td>
+                    <td>{{"{:,}".format(data['totDifference'])}}</td>
                 </tr>
             </blockTable>
         </keepInFrame>
