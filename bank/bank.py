@@ -1,7 +1,9 @@
 import json
 import click
+import webbrowser
 
 from .functions import slurp_statement_csv
+from .pdf import commit_to_pdf
 
 def print_json(ctx, param, value):
     if value == True:
@@ -30,9 +32,9 @@ def sum_category(category: str, filtered: list):
         "categoryDifference": 0.0,
     }
 
-    out['categoryMoneyOut'] = sum_list(filtered, True)
-    out['categoryMoneyIn'] = sum_list(filtered, False)
-    out['categoryDifference'] = out['categoryMoneyIn'] + out['categoryMoneyOut']
+    out['categoryMoneyOut'] = round(sum_list(filtered, True), 2)
+    out['categoryMoneyIn'] = round(sum_list(filtered, False), 2)
+    out['categoryDifference'] = round(out['categoryMoneyIn'] + out['categoryMoneyOut'], 2)
 
     return out
 
@@ -86,9 +88,6 @@ def filter_months(statement):
     return out
 
 def generate_insights(statement: list):
-    #print("Generating insights...")
-
-    # Just so I know what I'm trying to achieve
     out = {
         "totMoneyOut": 0.0,
         "totMoneyIn": 0.0,
@@ -97,9 +96,9 @@ def generate_insights(statement: list):
         "monthToMonthExpenditure": []
     }
 
-    out['totMoneyOut'] = sum_list(statement, True)
-    out['totMoneyIn'] = sum_list(statement, False)
-    out['totDifference'] = out['totMoneyIn'] + out['totMoneyOut']
+    out['totMoneyOut'] = round(sum_list(statement, True), 2)
+    out['totMoneyIn'] = round(sum_list(statement, False), 2)
+    out['totDifference'] = round(out['totMoneyIn'] + out['totMoneyOut'], 2)
 
     out['categoryExpenditure'] = filter_categories(statement)
     out['monthToMonthExpenditure'] = filter_months(statement)
@@ -107,13 +106,18 @@ def generate_insights(statement: list):
     return out
 
 
-@click.command(help='Takes a BMO generated transaction .csv file and interprets that data to provide insights.')
+@click.command(help='Takes a BMO generated transaction .csv file and interprets that data to provide insights. Creates a ')
 @click.option('-s', '--statement', prompt=True, help='Bank statement csv filename')
 @click.option('-p', '--print-json', help='Prints pretty JSON', default=False, is_flag=True, callback=print_json)
 def main(statement: str, print_json: bool):
-    statement_obj = slurp_statement_csv(f"./{statement.replace(' ','')}", False)
+    statement = statement.replace(' ','')
+    statement_obj = slurp_statement_csv(statement, False)
 
     insights_obj = generate_insights(statement_obj)
 
-    print(json.dumps(insights_obj, indent=4))
+    outfile = statement.replace('.csv','.pdf')
+    commit_to_pdf(insights_obj, outfile)
+    print(f"Saved insight to {outfile}")
+    webbrowser.open(outfile)
+
     return

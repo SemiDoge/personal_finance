@@ -6,3 +6,5 @@ bank/scraper.py
 
 *.json
 *.csv
+*.pyc
+*.pdf

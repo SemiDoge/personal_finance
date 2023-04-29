@@ -1,4 +1,7 @@
+--extra-index-url=https://isaiahandrews:C2qmUxaF3B5Y52p@www.reportlab.com/pypi/
 pandas
 streamlit
-numpy
 beautifulsoup4
+reportlab
+rlextra
+preppy
