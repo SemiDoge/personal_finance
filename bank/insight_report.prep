@@ -1,0 +1,112 @@
+{{def(data, colours, month)}}
+<!DOCTYPE document SYSTEM "rml.dtd">
+<document filename="x.pdf">
+    <template>
+        <pageTemplate id="main">
+            <pageGraphics>
+                <fill color="{{colours['bannerBG']}}"/>
+                <rect x="10" y="735" width="575" height="70" fill="yes" stroke="no"/> 
+                <fill color="{{colours['bannerFG']}}"/>
+                <setFont name="Helvetica" size="24"/>
+                <drawString x="45" y="775" >Transaction Insights</drawString>
+                <setFont name="Helvetica" size="14"/>
+                {{script}}
+                    import datetime as dt
+                    today = dt.datetime.today()
+                    today = today.strftime("%b %d/%Y")
+                {{endscript}}
+                <fill color="{{colours['stdFG']}}"/>
+                <rect x="10" y="6" width="575" height="20" fill="yes" stroke="no"/> 
+                <fill color="{{colours['bannerFG']}}"/>
+                <drawString x="500" y="10">{{today}}</drawString>
+            </pageGraphics>
+            <frame id="headline" x1="28" y1="700" width="400" height="20" showBoundary="0"/>
+            <frame id="headlineContent" x1="28" y1="575" width="400" height="100" showBoundary="0"/>
+            <frame id="monthlyContent" x1="28" y1="500" width="560" height="100" showBoundary="0"/>
+            <frame id="spendingPieChart" x1="355" y1="170" width="236" height="125" showBoundary="0"/>
+            <frame id="spendingTable" x1="28" y1="40" width="325" height="350" showBoundary="0"/>
+        </pageTemplate>
+    </template>
+    <stylesheet>
+        <paraStyle name="textstyle1" fontName="Helvetica" fontSize="14" leading="16" spaceBefore="16"/> 
+        <blockTableStyle id="tblTopline">
+            <blockFont name="Helvetica" size="12"/>
+            <blockTextColor colorName="red" start="1,0"/>
+            <blockTextColor colorName="green" start="1,1"/>
+                {{if data['totDifference'] > 0:}}
+                <blockTextColor colorName="green" start="1,2"/>
+                {{else:}}
+                <blockTextColor colorName="red" start="1,2"/>
+                {{endif}}
+        </blockTableStyle>
+        <blockTableStyle id="tblCatSpend">
+            <blockFont name="Courier-Bold" start="1,1" stop="-1,-1"/>
+            <blockAlignment value="right" start="0,1" stop="0,-1"/>
+            <blockAlignment value="center" start="1,1" stop="-1,-1"/>
+            <blockBackground colorName="{{colours['bannerBG']}}" start="0,0" stop="-1,0"/>
+            <blockFont name="Helvetica" size="12" start="0,0" stop="-1,0"/>
+            <blockFont name="Helvetica-Bold" start="0,1" stop="0,-1"/>
+            <blockTextColor colorName="white" start="0,0" stop="-1,0"/>
+        </blockTableStyle>
+    </stylesheet>
+    <story>
+        <keepInFrame frame="headline">
+            <h1 fontSize="24">Top-line spending figures:</h1>
+        </keepInFrame>
+        <keepInFrame frame="headlineContent">
+            <blockTable style="tblTopline">
+            <tr>
+                <td>Money spent YTD</td>
+                <td>${{abs(data['totMoneyOut'])}}</td>
+            </tr>
+            <tr>
+                <td>Money recieved YTD</td>
+                <td>${{data['totMoneyIn']}}</td>
+            </tr>
+            <tr>
+                <td>Net Money YTD</td>
+                <td>${{data['totDifference']}}</td>
+            </tr>
+            </blockTable>
+            
+        </keepInFrame>
+        <keepInFrame frame="monthlyContent">
+            <para style="textstyle1">
+                You spent an average of ${{month['avgPM']}} per month. Your most expensive month was {{month['biggestMonth'].strftime("%B")}} where you spent ${{month['biggestMonthSpend']}}.
+            </para>
+        </keepInFrame>
+        <keepInFrame frame="spendingPieChart">
+            <drawing module="bank.assets_pie" function="AssetPie2dp">
+                <param name = "pie.data">{{[(cat['categoryMoneyOut'])/data['totMoneyOut'] for cat in data['categoryExpenditure'] if cat['categoryMoneyOut'] != 0]}}</param>
+                <param name = "_labels">{{[cat['category'] for cat in data['categoryExpenditure'] if cat['categoryMoneyOut']]}}</param>
+            </drawing>
+        </keepInFrame>
+        <keepInFrame frame="spendingTable">
+            <h2>Detailed Spending Profile</h2>
+            <blockTable style="tblCatSpend">
+                <tr>
+                    <td>Category</td>
+                    <td>Money OUT</td>
+                    <td>Money IN</td>
+                    <td>Money NET</td>
+                </tr>
+
+                {{for category in data['categoryExpenditure']}}
+                    <tr>
+                        <td>{{category['category']}}</td>
+                        <td>{{category['categoryMoneyOut']}}</td>
+                        <td>{{category['categoryMoneyIn']}}</td>
+                        <td>{{category['categoryDifference']}}</td>
+                    </tr>
+                {{endfor}}
+
+                <tr>
+                    <td>Total/YTD</td>
+                    <td>{{data['totMoneyOut']}}</td>
+                    <td>{{data['totMoneyIn']}}</td>
+                    <td>{{data['totDifference']}}</td>
+                </tr>
+            </blockTable>
+        </keepInFrame>
+        </story>
+    </document>
