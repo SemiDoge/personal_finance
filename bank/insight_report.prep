@@ -45,7 +45,7 @@
                 <drawString x="500" y="10">{{today}}</drawString>
             </pageGraphics>
             <frame id="headline" x1="28" y1="700" width="400" height="20" showBoundary="0"/>
-            <frame id="transactionTable" x1="28" y1="55" width="555" height="630" showBoundary="1"/>
+            <frame id="transactionTable" x1="28" y1="55" width="555" height="630" showBoundary="0"/>
         </pageTemplate>
     </template>
     <stylesheet>
@@ -158,45 +158,47 @@
         <!-- This script calculates how to display transaction data into page spanning tables -->
         {{script}} 
             import math
+            import itertools
 
             totTrans = len(data['transactions'])
-            recordsPerPage = 25
+            remaining = totTrans
+            recordsPerPage = 35
             numOfTbl = math.ceil(totTrans/recordsPerPage)
-            print(totTrans)
-            print(recordsPerPage)
-            print(numOfTbl)
-        {{endscript}} 
-        <keepInFrame frame="transactionTable">
-            <blockTable style="tblTransaction">
-                <tr>
-                    <td>Date</td>
-                    <td>Amount</td>
-                    <td>Category</td>
-                    <td>Title</td>
-                </tr>
+            itr = itertools.cycle(data['transactions'])
 
-                {{for i in range(len(data['transactions']))}}
+            def trunTitle(str, maxLen):
+                if len(str) <= maxLen:
+                    return str
+                else:
+                    return str[:maxLen] + "..."
+        {{endscript}} 
+
+        {{for iTbl in range(numOfTbl):}}
+            <keepInFrame frame="transactionTable">
+                <blockTable style="tblTransaction">
                     <tr>
-                        <td>{{data['transactions'][i]['transactionTimestamp'].strftime("%b %d %Y")}}</td>
-                        <td leftPadding="10" align="DECIMAL">{{"{:,.2f}".format(data['transactions'][i]['transactionAmount'])}}</td>
-                        <td leftPadding="15">{{data['transactions'][i]['transactionCategory']}}</td>
-                        <td align="LEFT">{{data['transactions'][i]['transactionTitle']}}</td>
+                        <td>Date</td>
+                        <td>Amount</td>
+                        <td align="CENTER">Category</td>
+                        <td>Title</td>
                     </tr>
-                {{endfor}}
-            </blockTable>
-        </keepInFrame>
-        <nextPage />
-        <keepInFrame frame="transactionTable">
-            <blockTable style="tblTransaction">
-                <tr>
-                    <td>Date</td>
-                    <td>Amount</td>
-                    <td>Category</td>
-                    <td>Title</td>
-                </tr>
-            </blockTable>
-        </keepInFrame>
-         
+
+                    {{for iRow in range(min(recordsPerPage, remaining))}}
+                        {{script}}{{item = next(itr)}}{{endscript}}
+                        <tr>
+                            <td>{{item['transactionTimestamp'].strftime("%b %d %Y")}}</td>
+                            <td>{{"{:,.2f}".format(item['transactionAmount'])}}</td>
+                            <td align="CENTER">{{item['transactionCategory']}}</td>
+                            <td align="LEFT">{{trunTitle(item['transactionTitle'], 45)}}</td>
+                        </tr>
+                    {{endfor}}
+                </blockTable>
+            </keepInFrame>
+            <nextPage />
+            {{script}}
+                remaining -= recordsPerPage
+            {{endscript}}
+        {{endfor}}
         {{endif}}
     </story>
 </document>
