@@ -33,7 +33,7 @@ def generate_time_info(statement):
     return time
 
 
-def commit_to_pdf(data: dict, outfile: str, statement, verbose: bool = False):
+def commit_to_pdf(data: dict, outfile: str, statement: list[dict], verbose: bool = False):
 
     data['period'] = generate_time_info(statement)
 
@@ -42,10 +42,8 @@ def commit_to_pdf(data: dict, outfile: str, statement, verbose: bool = False):
 
     colours = {
         "stdFG": "#000000",
-        "bannerBG": "#0173B5",
-        "bannerFG": "#E8E8E8",
-        "tblBG": "#DDDDDD",
-        "tblBGAlt": "#F2F2F2"
+        "bannerBG": "#0173B5",  "bannerFG": "#E8E8E8",
+        "tblBG": "#DDDDDD",     "tblBGAlt": "#F2F2F2"
     }
 
     template = preppy.getModule('bank/insight_report.prep')

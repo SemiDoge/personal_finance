@@ -8,6 +8,8 @@
 
     idx = len(data['monthToMonthExpenditure'])
 
+    # Defining variables that can be used across the template
+    maxTitleLen = 50
     first = data['period']['fTrnsDate'].strftime("%b %d, %Y")
     last = data['period']['lTrnsDate'].strftime("%b %d, %Y")
     period = f"{first} to {last}"
@@ -185,7 +187,7 @@
 
             {{for iTbl in range(numOfTbl):}}
                 <keepInFrame frame="headline">
-                    <h1>Period: {{get_range()}}</h1>
+                    <h1>{{get_range()}}</h1>
                 </keepInFrame>
                 <keepInFrame frame="transactionTable">
                     <blockTable style="tblTransaction">
@@ -205,7 +207,7 @@
                                 <td>{{item['transactionTimestamp'].strftime("%b %d %Y")}}</td>
                                 <td align="RIGHT">{{"{:,.2f}".format(item['transactionAmount'])}}</td>
                                 <td align="CENTER">{{item['transactionCategory']}}</td>
-                                <td align="LEFT">{{trunTitle(item['transactionTitle'], 45)}}</td>
+                                <td align="LEFT">{{trunTitle(item['transactionTitle'], maxTitleLen)}}</td>
                             </tr>
                         {{endfor}}
                     </blockTable>
