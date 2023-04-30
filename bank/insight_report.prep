@@ -7,7 +7,10 @@
     today = today.strftime("%b %d/%Y")
 
     idx = len(data['monthToMonthExpenditure'])
-    period = data['monthToMonthExpenditure'][idx - 1]['category']
+
+    first = data['period']['fTrnsDate'].strftime("%b %d, %Y")
+    last = data['period']['lTrnsDate'].strftime("%b %d, %Y")
+    period = f"{first} to {last}"
 {{endscript}}
 <document filename="x.pdf">
     <template>
@@ -91,7 +94,7 @@
         </keepInFrame>
         <keepInFrame>
             <para style="textstyle1">
-                Period up to {{period}}
+                <b>Period:</b> {{period}}
             </para>
         </keepInFrame>
         <keepInFrame frame="headlineContent">
@@ -127,78 +130,91 @@
             <blockTable style="tblCatSpend">
                 <tr>
                     <td>Category</td>
-                    <td>Money OUT</td>
-                    <td>Money IN</td>
-                    <td>Money NET</td>
+                    <td align="CENTER">$ OUT</td>
+                    <td align="CENTER">$ IN</td>
+                    <td align="CENTER">$ NET</td>
                 </tr>
 
                 {{for category in data['categoryExpenditure']}}
                     <tr>
                         <td>{{category['category']}}</td>
-                        <td>{{"{:,.2f}".format(category['categoryMoneyOut'])}}</td>
-                        <td>{{"{:,.2f}".format(category['categoryMoneyIn'])}}</td>
-                        <td>{{"{:,.2f}".format(category['categoryDifference'])}}</td>
+                        <td align="RIGHT">{{"{:,.2f}".format(category['categoryMoneyOut'])}}</td>
+                        <td align="RIGHT">{{"{:,.2f}".format(category['categoryMoneyIn'])}}</td>
+                        <td align="RIGHT">{{"{:,.2f}".format(category['categoryDifference'])}}</td>
                     </tr>
                 {{endfor}}
 
                 <tr>
                     <td>Total/YTD</td>
-                    <td>{{"{:,.2f}".format(data['totMoneyOut'])}}</td>
-                    <td>{{"{:,.2f}".format(data['totMoneyIn'])}}</td>
-                    <td>{{"{:,.2f}".format(data['totDifference'])}}</td>
+                    <td align="RIGHT">{{"{:,.2f}".format(data['totMoneyOut'])}}</td>
+                    <td align="RIGHT">{{"{:,.2f}".format(data['totMoneyIn'])}}</td>
+                    <td align="RIGHT">{{"{:,.2f}".format(data['totDifference'])}}</td>
                 </tr>
             </blockTable>
         </keepInFrame>
+
         <!-- This branch will display all of the transactions -->
         {{if verbose == True:}}
-        <switchTemplate name="transactions"/>
-        <keepInFrame frame="headline">
-            <h1>All transactions in period</h1>
-        </keepInFrame>
-        <!-- This script calculates how to display transaction data into page spanning tables -->
-        {{script}} 
-            import math
-            import itertools
+            <switchTemplate name="transactions"/>
+            
+            <!-- This script calculates how to display transaction data into page spanning tables -->
+            {{script}} 
+                import math
+                import itertools
 
-            totTrans = len(data['transactions'])
-            remaining = totTrans
-            recordsPerPage = 35
-            numOfTbl = math.ceil(totTrans/recordsPerPage)
-            itr = itertools.cycle(data['transactions'])
+                totTrans = len(data['transactions'])
+                remaining = totTrans
+                recordsPerPage = 35
+                numOfTbl = math.ceil(totTrans/recordsPerPage)
+                itr = itertools.cycle(data['transactions'])
+                lastProcessed = 0
 
-            def trunTitle(str, maxLen):
-                if len(str) <= maxLen:
-                    return str
-                else:
-                    return str[:maxLen] + "..."
-        {{endscript}} 
+                def trunTitle(str, maxLen):
+                    if len(str) <= maxLen:
+                        return str
+                    else:
+                        return str[:maxLen] + "..."
+                
+                def get_range():
+                    first = data['transactions'][lastProcessed]['transactionTimestamp'].strftime("%b %d, %Y")
+                    last = data['transactions'][(lastProcessed + min(remaining, recordsPerPage)) -1]['transactionTimestamp'].strftime("%b %d, %Y")
 
-        {{for iTbl in range(numOfTbl):}}
-            <keepInFrame frame="transactionTable">
-                <blockTable style="tblTransaction">
-                    <tr>
-                        <td>Date</td>
-                        <td>Amount</td>
-                        <td align="CENTER">Category</td>
-                        <td>Title</td>
-                    </tr>
+                    return f"{first} to {last}"
 
-                    {{for iRow in range(min(recordsPerPage, remaining))}}
-                        {{script}}{{item = next(itr)}}{{endscript}}
+            {{endscript}} 
+
+            {{for iTbl in range(numOfTbl):}}
+                <keepInFrame frame="headline">
+                    <h1>Period: {{get_range()}}</h1>
+                </keepInFrame>
+                <keepInFrame frame="transactionTable">
+                    <blockTable style="tblTransaction">
                         <tr>
-                            <td>{{item['transactionTimestamp'].strftime("%b %d %Y")}}</td>
-                            <td>{{"{:,.2f}".format(item['transactionAmount'])}}</td>
-                            <td align="CENTER">{{item['transactionCategory']}}</td>
-                            <td align="LEFT">{{trunTitle(item['transactionTitle'], 45)}}</td>
+                            <td>Date</td>
+                            <td>Amount</td>
+                            <td align="CENTER">Category</td>
+                            <td>Transaction Description</td>
                         </tr>
-                    {{endfor}}
-                </blockTable>
-            </keepInFrame>
-            <nextPage />
-            {{script}}
-                remaining -= recordsPerPage
-            {{endscript}}
-        {{endfor}}
+
+                        {{for iRow in range(min(recordsPerPage, remaining))}}
+                            {{script}}
+                                item = next(itr)
+                                lastProcessed += 1
+                            {{endscript}}
+                            <tr>
+                                <td>{{item['transactionTimestamp'].strftime("%b %d %Y")}}</td>
+                                <td align="RIGHT">{{"{:,.2f}".format(item['transactionAmount'])}}</td>
+                                <td align="CENTER">{{item['transactionCategory']}}</td>
+                                <td align="LEFT">{{trunTitle(item['transactionTitle'], 45)}}</td>
+                            </tr>
+                        {{endfor}}
+                    </blockTable>
+                </keepInFrame>
+                <nextPage />
+                {{script}}
+                    remaining -= recordsPerPage
+                {{endscript}}
+            {{endfor}}
         {{endif}}
     </story>
 </document>

@@ -1,6 +1,7 @@
 import json
 import click
 import webbrowser
+import os
 
 from .functions import slurp_statement_csv
 from .pdf import commit_to_pdf
@@ -117,11 +118,12 @@ def main(statement: str, print_json: bool, verbose: bool):
 
     outfile = statement.replace('.csv','.pdf')
     if verbose == True:
-        commit_to_pdf(insights_obj, outfile, statement_obj)
+        outfile = f"{outfile[:len(outfile)-4]}_detailed.pdf"
+        commit_to_pdf(insights_obj, outfile, statement_obj, True)
     else:
-        commit_to_pdf(insights_obj, outfile)
+        commit_to_pdf(insights_obj, outfile, statement_obj)
 
-    print(f"Saved insight to {outfile}")
+    print(f"Saved insight to {os.path.abspath(outfile)}")
     webbrowser.open(outfile)
 
     return

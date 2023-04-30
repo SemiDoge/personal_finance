@@ -10,35 +10,46 @@ from rlextra.rml2pdf import rml2pdf
 import preppy
 import datetime as dt
 
-def commit_to_pdf(data, outfile, statement = None):
+def generate_monthly_insights(data: dict):
+    month = {}
 
-    verbose = False
+    bgm = max(data['monthToMonthExpenditure'], key=lambda cat: abs(cat['categoryMoneyOut']))
 
-    if statement != None:
-        verbose = True
+    month['avgPM'] = abs(round(data['totMoneyOut'] / len(data['monthToMonthExpenditure']), 2))
+    month['biggestMonth'] = dt.datetime.strptime(bgm['category'], "%Y/%m")
+    month['biggestMonthSpend'] = abs(bgm['categoryMoneyOut'])
+
+    return month
+
+def generate_time_info(statement):
+    time = {}
+
+    latestDate = max(statement, key=lambda ts: ts['transactionTimestamp'])
+    earliestDate = min(statement, key=lambda ts: ts['transactionTimestamp'])
+
+    time['fTrnsDate'] = earliestDate['transactionTimestamp']
+    time['lTrnsDate'] = latestDate['transactionTimestamp']
+
+    return time
+
+
+def commit_to_pdf(data: dict, outfile: str, statement, verbose: bool = False):
+
+    data['period'] = generate_time_info(statement)
+
+    if verbose == True:
         data['transactions'] = statement
 
     colours = {
         "stdFG": "#000000",
         "bannerBG": "#0173B5",
         "bannerFG": "#E8E8E8",
-        "tblBG": "#F5F5DC",
-        "tblBGAlt": "#E1C699"
+        "tblBG": "#DDDDDD",
+        "tblBGAlt": "#F2F2F2"
     }
-
-    month = {
-        "avgPM": 0.0,
-        "biggestMonth": "",
-        "biggestMonthSpend": 0.0
-    }
-
-    month['avgPM'] = abs(round(data['totMoneyOut'] / len(data['monthToMonthExpenditure']), 2))
-    bgm = max(data['monthToMonthExpenditure'], key=lambda cat: abs(cat['categoryMoneyOut']))
-    month['biggestMonth'] = dt.datetime.strptime(bgm['category'], "%Y/%m")
-    month['biggestMonthSpend'] = abs(bgm['categoryMoneyOut'])
 
     template = preppy.getModule('bank/insight_report.prep')
-    rmlText = template.get(data, colours, month, verbose)
+    rmlText = template.get(data, colours, generate_monthly_insights(data), verbose)
 
     rml2pdf.go(rmlText, outputFileName=outfile)
 
