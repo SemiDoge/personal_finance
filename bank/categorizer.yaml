@@ -1,0 +1,69 @@
+- category: Subscriptions
+  strings:
+    - RECURRING
+
+- category: Refunds
+  strings:
+    - REFUND
+
+- category: Government/Taxes
+  strings:
+    - CANADA
+    - GST
+    - HST
+    - CRA
+    - FED
+    - GOV CA
+
+- category: Transfers
+  strings:
+    - ETRNSFR
+    - RECVD
+    - "TF "
+
+- category: Steam/Games
+  strings:
+    - STEAM
+    - JAGEX
+    - SONY
+    - XBOX
+    - NINTENDO
+
+- category: Online/Amazon
+  strings:
+    - AMZN
+    - AMZN MKTP
+
+- category: Gas/Convenience
+  strings:
+    - SHELL
+    - ESSO
+
+- category: Groceries
+  strings:
+    - ZEHRS
+    - FRESHCO
+    - BULK BARN
+
+- category: Fast Food
+  strings:
+    - BK
+    - MCDONALD'S
+    - MCDONALDS
+    - PIZZA
+    - DAIRY QUEEN
+    - TIM HORTONS
+    - MARY BROWNS
+    - CAESARS
+    - WENDY'S
+
+- category: Keyboards
+  strings:
+    - KEYBOARDS
+    - KEEB
+    - TYPIST
+    - RINGER
+
+- category: Online/Others
+  strings:
+    - ONLINE
