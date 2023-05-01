@@ -5,41 +5,29 @@ import os
 
 from .log import log, Log
 from .config import Configuration
-from .functions import slurp_statement_csv, filter_categories, filter_months, sum_list
+from .functions import slurp_statement_csv, generate_insights
 from .pdf import commit_to_pdf
 
 def print_json(ctx, param, value):
     statement = ctx.params['statement'].replace(' ','')
-    config = Configuration()
-    categorizer = config.get_categorizer()
-
-    try:
-        if value == True:
+    
+    if value == True:
+        try:
+            config = Configuration(config_dir="bank/config")
+            categorizer = config.get_categorizer()
             print(json.dumps(slurp_statement_csv(categorizer, f"./{statement}", True), default=str, indent=4))
             ctx.exit(0)
-    except FileNotFoundError: 
-        log(Log.ERROR, f"File '{statement}' not found!")
-        ctx.exit(-1)
+        except FileNotFoundError: 
+            log(Log.ERROR, f"File '{statement}' not found!")
+            ctx.exit(-1)
 
-def generate_insights(categorizer: list[dict], statement: list[dict]):
-    out = {}
-
-    out['totMoneyOut'] = round(sum_list(statement, True), 2)
-    out['totMoneyIn'] = round(sum_list(statement, False), 2)
-    out['totDifference'] = round(out['totMoneyIn'] + out['totMoneyOut'], 2)
-
-    out['categoryExpenditure'] = filter_categories(categorizer, statement)
-    out['monthToMonthExpenditure'] = filter_months(statement)
-    
-    return out
-
-@click.command(help='Takes a BMO generated transaction .csv file and interprets that data to provide insights in the form of a viewable PDF.')
+@click.command(help='Takes a BMO generated transaction .csv file and interprets that data to provide insights in the form of a viewable PDF.', context_settings=dict(help_option_names=['-h','--help']))
 @click.option('-s', '--statement', prompt=True, help='Bank statement csv filename.')
 @click.option('-v', '--verbose', is_flag=True, help='Includes itemized transactions along with insights PDF.')
 @click.option('-p', '--print-json', help='Prints pretty JSON (alternate to PDF).', default=False, is_flag=True, callback=print_json)
 def main(statement: str, print_json: bool, verbose: bool):
     statement = statement.replace(' ','')
-    config = Configuration()
+    config = Configuration(config_dir="bank/config")
     categorizer = config.get_categorizer()
 
     try:

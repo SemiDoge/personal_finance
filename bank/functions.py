@@ -7,6 +7,18 @@ import datetime as dt
 
 from .log import log, Log
 
+def generate_insights(categorizer: list[dict], statement: list[dict]):
+    out = {}
+
+    out['totMoneyOut'] = round(sum_list(statement, True), 2)
+    out['totMoneyIn'] = round(sum_list(statement, False), 2)
+    out['totDifference'] = round(out['totMoneyIn'] + out['totMoneyOut'], 2)
+
+    out['categoryExpenditure'] = filter_categories(categorizer, statement)
+    out['monthToMonthExpenditure'] = filter_months(statement)
+    
+    return out
+
 def generate_monthly_insights(data: dict):
     month = {}
 
