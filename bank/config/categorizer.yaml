@@ -8,12 +8,12 @@
 
 - category: Government/Taxes
   strings:
-    - CANADA
-    - GST
-    - HST
+    - " GST/"
+    - " PRO/"
+    - " FED/"
     - CRA
-    - FED
     - GOV CA
+    - "CANADA "
 
 - category: Transfers
   strings:
@@ -33,11 +33,16 @@
   strings:
     - AMZN
     - AMZN MKTP
+    - AMAZON.CA
+    - AMAZON.COM
 
 - category: Gas/Convenience
   strings:
     - SHELL
     - ESSO
+    - SHOPPERS DRUG M
+    - HASTY MARKET
+    - LITTLE SHORT
 
 - category: Groceries
   strings:

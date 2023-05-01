@@ -4,16 +4,17 @@ import os
 from .log import log, Log
 
 class Configuration():
-    def __init__(self):
-        self.categorizer_path = "bank/config/categorizer.yaml"
+    def __init__(self, config_dir: str):
+        self.categorizer_path = f"{config_dir}/categorizer.yaml"
         self.categorizer = self.load_categorizer_config()
 
     def load_categorizer_config(self):
         default_categorizer = [
             {'category': 'Subscriptions', 'strings': ['RECURRING']},
             {'category': 'Refunds', 'strings': ['REFUND']},
-            {'category': 'Government/Taxes', 'strings': ['CANADA', 'GST', 'HST', 'CRA', 'FED', 'GOV CA']},
-            {'category': 'Transfers', 'strings': ['ETRNSFR', 'RECVD', 'TF ']}
+            {'category': 'Government/Taxes', 'strings': ['CANADA ', ' GST', ' PRO', ' FED', 'CRA', 'GOV CA']},
+            {'category': 'Transfers', 'strings': ['ETRNSFR', 'RECVD', 'TF ']},
+            {'category': 'Online/Others', 'strings': ['ONLINE']}
         ] 
 
         try: 
