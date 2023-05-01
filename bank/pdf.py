@@ -6,7 +6,7 @@ from reportlab.graphics.shapes import Drawing, _DrawingEditorMixin
 from reportlab.lib.colors import PCMYKColor, toColor, Whiter
 from reportlab.lib.validators import Auto
 from rlextra.rml2pdf import rml2pdf
-1
+
 from .functions import generate_monthly_insights, generate_time_info
 
 def commit_to_pdf(data: dict, outfile: str, statement: list[dict], verbose: bool = False):
