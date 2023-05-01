@@ -51,13 +51,17 @@ def main(statement: str, print_json: bool, verbose: bool):
     insights_obj = generate_insights(categorizer, statement_obj)
 
     outfile = statement.replace('.csv','.pdf')
-    if verbose == True:
-        outfile = f"{outfile[:len(outfile)-4]}_detailed.pdf"
-        commit_to_pdf(insights_obj, outfile, statement_obj, True)
-    else:
-        commit_to_pdf(insights_obj, outfile, statement_obj)
+    try:
+        if verbose == True:
+            outfile = f"{outfile[:len(outfile)-4]}_detailed.pdf"
+            commit_to_pdf(insights_obj, outfile, statement_obj, True)
+        else:
+            commit_to_pdf(insights_obj, outfile, statement_obj)
 
-    print(f"Saved insight to {os.path.abspath(outfile)}")
-    webbrowser.open(outfile)
+        log(Log.INFO, f"Saved insight to {os.path.abspath(outfile)}")
+        webbrowser.open(outfile)
+    except IOError as error:
+        log(Log.ERROR, f"Error creating or writing to file '{outfile}'")
+        return
 
     return

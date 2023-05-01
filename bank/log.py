@@ -18,7 +18,6 @@ def log(type: Log, message: str):
     init()
 
     foreground = Fore.RESET
-    #message = ""
 
     match type:
         case Log.TRACE:  

@@ -60,8 +60,6 @@ def extract_timestamp(ts: str):
 
     return datetime.datetime(int(year), int(month), int(day))
 
-
-
 def categorize(categorizer, transactionTitle: str):
     
     for i in range(len(categorizer)):
@@ -81,6 +79,7 @@ def filter_categories(categorizer: list[dict], statement):
 
     category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Others"])
 
+    # removes empty categories so they don't mess up generated pie chart
     for i in range(len(category_dicts)):
         if len(category_dicts[i]) > 0:
            out.append(sum_category(category_dicts[i][0]['transactionCategory'], category_dicts[i]))
@@ -93,9 +92,11 @@ def filter_months(statement):
     month_dicts = []
     out = []
 
+    # 12 for 12 months in year
     for i in range(12):
         month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == i])
 
+    # removes empty/future months
     for i in range(len(month_dicts)):
         if len(month_dicts[i]) > 0:
             out.append(sum_category(month_dicts[i][0]['transactionTimestamp'].strftime("%Y/%m"), month_dicts[i]))
