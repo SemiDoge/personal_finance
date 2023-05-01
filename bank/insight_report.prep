@@ -42,7 +42,7 @@
                 <rect x="10" y="735" width="575" height="70" fill="yes" stroke="no"/> 
                 <fill color="{{colours['bannerFG']}}"/>
                 <setFont name="Helvetica" size="24"/>
-                <drawString x="45" y="775" >Transaction Insights</drawString>
+                <drawString x="45" y="775" >Transactions Table</drawString>
                 <setFont name="Helvetica" size="14"/>
                 <fill color="{{colours['stdFG']}}"/>
                 <rect x="10" y="6" width="575" height="20" fill="yes" stroke="no"/> 
