@@ -9,12 +9,13 @@ from .functions import slurp_statement_csv, filter_categories, filter_months, su
 from .pdf import commit_to_pdf
 
 def print_json(ctx, param, value):
-
     statement = ctx.params['statement'].replace(' ','')
+    config = Configuration()
+    categorizer = config.get_categorizer()
 
     try:
         if value == True:
-            print(json.dumps(slurp_statement_csv(f"./{statement}", True), default=str, indent=4))
+            print(json.dumps(slurp_statement_csv(categorizer, f"./{statement}", True), default=str, indent=4))
             ctx.exit(0)
     except FileNotFoundError: 
         log(Log.ERROR, f"File '{statement}' not found!")
