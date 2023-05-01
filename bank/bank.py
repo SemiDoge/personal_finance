@@ -2,10 +2,10 @@ import json
 import click
 import webbrowser
 import os
-import yaml
 
 from .log import log, Log
-from .functions import slurp_statement_csv, filter_categories, filter_months, sum_list, load_categorizer_config
+from .config import Configuration
+from .functions import slurp_statement_csv, filter_categories, filter_months, sum_list
 from .pdf import commit_to_pdf
 
 def print_json(ctx, param, value):
@@ -20,20 +20,8 @@ def print_json(ctx, param, value):
         log(Log.ERROR, f"File '{statement}' not found!")
         ctx.exit(-1)
 
-def generate_insights(statement: list[dict]):
+def generate_insights(categorizer: list[dict], statement: list[dict]):
     out = {}
-    configFile = "bank/categorizer.yaml"
-
-    try: 
-        categorizer = load_categorizer_config(configFile)
-    except FileNotFoundError:
-        log(Log.ERROR, f"Config file '{configFile}' not found!")
-        log(Log.WARNING, f"Using default categorizer.")
-        categorizer = load_categorizer_config(configFile, default=True)
-    except yaml.scanner.ScannerError as error:
-        log(Log.ERROR, f"Invalid YAML contained in config file '{configFile}': {error.context} {error.problem} near [{error.context_mark.line}, {error.context_mark.column}]")
-        log(Log.WARNING, f"Using default categorizer.")
-        categorizer = load_categorizer_config(configFile, default=True)
 
     out['totMoneyOut'] = round(sum_list(statement, True), 2)
     out['totMoneyIn'] = round(sum_list(statement, False), 2)
@@ -50,14 +38,16 @@ def generate_insights(statement: list[dict]):
 @click.option('-p', '--print-json', help='Prints pretty JSON (alternate to PDF).', default=False, is_flag=True, callback=print_json)
 def main(statement: str, print_json: bool, verbose: bool):
     statement = statement.replace(' ','')
+    config = Configuration()
+    categorizer = config.get_categorizer()
 
     try:
-        statement_obj = slurp_statement_csv(statement, False)
-    except FileNotFoundError:
-        log(Log.ERROR, f"File '{statement}' not found!")
+        statement_obj = slurp_statement_csv(categorizer, statement, False)
+    except FileNotFoundError as error:
+        log(Log.ERROR, f"File '{error.filename}' not found!")
         return -1
 
-    insights_obj = generate_insights(statement_obj)
+    insights_obj = generate_insights(categorizer, statement_obj)
 
     outfile = statement.replace('.csv','.pdf')
     if verbose == True:

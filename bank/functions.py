@@ -1,7 +1,7 @@
 import csv
 import datetime
 import re
-import yaml
+import os
 
 import datetime as dt
 
@@ -60,24 +60,10 @@ def extract_timestamp(ts: str):
 
     return datetime.datetime(int(year), int(month), int(day))
 
-def load_categorizer_config(configFile: str, default: bool = False):
 
-    if default == True:
-        return [
-            {'category': 'Subscriptions', 'strings': ['RECURRING']},
-            {'category': 'Refunds', 'strings': ['REFUND']},
-            {'category': 'Government/Taxes', 'strings': ['CANADA', 'GST', 'HST', 'CRA', 'FED', 'GOV CA']},
-            {'category': 'Transfers', 'strings': ['ETRNSFR', 'RECVD', 'TF ']}
-        ]
-
-    with open(configFile, 'r') as f:
-        categorizer = yaml.load(f, Loader=yaml.SafeLoader)
-    
-    return categorizer
 
 def categorize(categorizer, transactionTitle: str):
     
-
     for i in range(len(categorizer)):
         for str in categorizer[i]['strings']:
             term = transactionTitle.find(str)
@@ -118,21 +104,9 @@ def filter_months(statement):
     
     return out
 
-def slurp_statement_csv(file: str, bForPrint: bool):
+def slurp_statement_csv(categorizer, file: str, bForPrint: bool):
 
     records = []
-    configFile = "bank/categorizer.yaml"
-
-    try: 
-        categorizer = load_categorizer_config(configFile)
-    except FileNotFoundError:
-        log(Log.ERROR, f"Config file '{configFile}' not found!")
-        log(Log.WARNING, f"Using default categorizer.")
-        categorizer = load_categorizer_config(configFile, default=True)
-    except yaml.scanner.ScannerError as error:
-        log(Log.ERROR, f"Invalid YAML contained in config file '{configFile}': {error.context} {error.problem} near [{error.context_mark.line}, {error.context_mark.column}]")
-        log(Log.WARNING, f"Using default categorizer.")
-        categorizer = load_categorizer_config(configFile, default=True)
 
     try:
         with open(file, "r", encoding='utf-8') as statement:
@@ -168,7 +142,7 @@ def slurp_statement_csv(file: str, bForPrint: bool):
                         )
                     )
     except PermissionError:
-        log(Log.ERROR, f"User does not have permissions to access file '{file}'")
+        log(Log.ERROR, f"User '{os.getlogin()}' does not have permissions to access file '{self.categorizer_path}'")
         exit(-1)
         
 
