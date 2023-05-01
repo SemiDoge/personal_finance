@@ -1,37 +1,13 @@
+import preppy
+
 from reportlab.graphics.charts.legends import Legend
 from reportlab.graphics.charts.piecharts import Pie
-from reportlab.pdfbase.pdfmetrics import stringWidth, EmbeddedType1Face, registerTypeFace, Font, registerFont
 from reportlab.graphics.shapes import Drawing, _DrawingEditorMixin
-from reportlab.lib.colors import PCMYKColor, Color, toColor, Whiter
+from reportlab.lib.colors import PCMYKColor, toColor, Whiter
 from reportlab.lib.validators import Auto
-
 from rlextra.rml2pdf import rml2pdf
-
-import preppy
-import datetime as dt
-
-def generate_monthly_insights(data: dict):
-    month = {}
-
-    bgm = max(data['monthToMonthExpenditure'], key=lambda cat: abs(cat['categoryMoneyOut']))
-
-    month['avgPM'] = abs(round(data['totMoneyOut'] / len(data['monthToMonthExpenditure']), 2))
-    month['biggestMonth'] = dt.datetime.strptime(bgm['category'], "%Y/%m")
-    month['biggestMonthSpend'] = abs(bgm['categoryMoneyOut'])
-
-    return month
-
-def generate_time_info(statement):
-    time = {}
-
-    latestDate = max(statement, key=lambda ts: ts['transactionTimestamp'])
-    earliestDate = min(statement, key=lambda ts: ts['transactionTimestamp'])
-
-    time['fTrnsDate'] = earliestDate['transactionTimestamp']
-    time['lTrnsDate'] = latestDate['transactionTimestamp']
-
-    return time
-
+1
+from .functions import generate_monthly_insights, generate_time_info
 
 def commit_to_pdf(data: dict, outfile: str, statement: list[dict], verbose: bool = False):
 

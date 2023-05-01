@@ -128,7 +128,7 @@
             </drawing>
         </keepInFrame>
         <keepInFrame frame="spendingTable">
-            <h2>Detailed Spending Profile</h2>
+            <h2>Detailed Spending by Category</h2>
             <blockTable style="tblCatSpend">
                 <tr>
                     <td>Category</td>
