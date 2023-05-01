@@ -60,7 +60,7 @@ def extract_timestamp(ts: str):
 
     return datetime.datetime(int(year), int(month), int(day))
 
-def loadCategorizerConfig(configFile: str, default: bool = False):
+def load_categorizer_config(configFile: str, default: bool = False):
 
     if default == True:
         return [
@@ -86,21 +86,13 @@ def categorize(categorizer, transactionTitle: str):
     
     return "Others"
 
-def filter_categories(statement):
+def filter_categories(categorizer: list[dict], statement):
     category_dicts = []
     out = []
 
-    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Subscriptions"])
-    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Refunds"])
-    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Transfers"])
-    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Government/Taxes"])
-    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Steam/Games"])
-    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Online/Amazon"])
-    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Gas/Convenience"])
-    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Groceries"])
-    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Fast Food"])
-    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Keyboards"])
-    category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Online/Others"])
+    for i in range(len(categorizer)):
+        category_dicts.append([{**record} for record in statement if record['transactionCategory'] == categorizer[i]['category']])
+
     category_dicts.append([{**record} for record in statement if record['transactionCategory'] == "Others"])
 
     for i in range(len(category_dicts)):
@@ -115,18 +107,8 @@ def filter_months(statement):
     month_dicts = []
     out = []
 
-    month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == 1])
-    month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == 2])
-    month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == 3])
-    month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == 4])
-    month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == 5])
-    month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == 6])
-    month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == 7])
-    month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == 8])
-    month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == 9])
-    month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == 10])
-    month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == 11])
-    month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == 12])
+    for i in range(12):
+        month_dicts.append([{**record} for record in statement if record['transactionTimestamp'].month == i])
 
     for i in range(len(month_dicts)):
         if len(month_dicts[i]) > 0:
@@ -142,15 +124,15 @@ def slurp_statement_csv(file: str, bForPrint: bool):
     configFile = "bank/categorizer.yaml"
 
     try: 
-        categorizer = loadCategorizerConfig(configFile)
+        categorizer = load_categorizer_config(configFile)
     except FileNotFoundError:
         log(Log.ERROR, f"Config file '{configFile}' not found!")
         log(Log.WARNING, f"Using default categorizer.")
-        categorizer = loadCategorizerConfig(configFile, default=True)
+        categorizer = load_categorizer_config(configFile, default=True)
     except yaml.scanner.ScannerError as error:
         log(Log.ERROR, f"Invalid YAML contained in config file '{configFile}': {error.context} {error.problem} near [{error.context_mark.line}, {error.context_mark.column}]")
         log(Log.WARNING, f"Using default categorizer.")
-        categorizer = loadCategorizerConfig(configFile, default=True)
+        categorizer = load_categorizer_config(configFile, default=True)
 
     try:
         with open(file, "r", encoding='utf-8') as statement:

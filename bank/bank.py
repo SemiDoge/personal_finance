@@ -2,9 +2,10 @@ import json
 import click
 import webbrowser
 import os
+import yaml
 
 from .log import log, Log
-from .functions import slurp_statement_csv, filter_categories, filter_months, sum_list
+from .functions import slurp_statement_csv, filter_categories, filter_months, sum_list, load_categorizer_config
 from .pdf import commit_to_pdf
 
 def print_json(ctx, param, value):
@@ -21,12 +22,24 @@ def print_json(ctx, param, value):
 
 def generate_insights(statement: list[dict]):
     out = {}
+    configFile = "bank/categorizer.yaml"
+
+    try: 
+        categorizer = load_categorizer_config(configFile)
+    except FileNotFoundError:
+        log(Log.ERROR, f"Config file '{configFile}' not found!")
+        log(Log.WARNING, f"Using default categorizer.")
+        categorizer = load_categorizer_config(configFile, default=True)
+    except yaml.scanner.ScannerError as error:
+        log(Log.ERROR, f"Invalid YAML contained in config file '{configFile}': {error.context} {error.problem} near [{error.context_mark.line}, {error.context_mark.column}]")
+        log(Log.WARNING, f"Using default categorizer.")
+        categorizer = load_categorizer_config(configFile, default=True)
 
     out['totMoneyOut'] = round(sum_list(statement, True), 2)
     out['totMoneyIn'] = round(sum_list(statement, False), 2)
     out['totDifference'] = round(out['totMoneyIn'] + out['totMoneyOut'], 2)
 
-    out['categoryExpenditure'] = filter_categories(statement)
+    out['categoryExpenditure'] = filter_categories(categorizer, statement)
     out['monthToMonthExpenditure'] = filter_months(statement)
     
     return out
