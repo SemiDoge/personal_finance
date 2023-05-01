@@ -142,8 +142,7 @@ def slurp_statement_csv(categorizer, file: str, bForPrint: bool):
                         )
                     )
     except PermissionError:
-        log(Log.ERROR, f"User '{os.getlogin()}' does not have permissions to access file '{self.categorizer_path}'")
+        log(Log.ERROR, f"User '{os.getlogin()}' does not have permissions to access file '{file}'")
         exit(-1)
-        
 
     return records
