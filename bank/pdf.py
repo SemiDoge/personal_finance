@@ -26,8 +26,13 @@ def commit_to_pdf(
         "tblBGAlt": "#F2F2F2",
     }
 
+    # bank_info = {"name": "Scotia", "bannerBG": "#EA0E18"}
+    bank_info = {"name": "BMO", "bannerBG": "#0173B5"}
+
     template = preppy.getModule("bank/insight_report.prep")
-    rmlText = template.get(data, colours, generate_monthly_insights(data), verbose)
+    rmlText = template.get(
+        data, colours, generate_monthly_insights(data), verbose, bank_info
+    )
 
     rml2pdf.go(rmlText, outputFileName=outfile)
 
