@@ -4,6 +4,7 @@ import datetime as dt
 from colorama import init, Fore, Style
 from enum import Enum
 
+
 class Log(Enum):
     TRACE = 1
     DEBUG = 2
@@ -14,13 +15,14 @@ class Log(Enum):
     def __str__(self):
         return self.name.lower()
 
+
 def log(type: Log, message: str):
     init()
 
     foreground = Fore.RESET
 
     match type:
-        case Log.TRACE:  
+        case Log.TRACE:
             foreground = Fore.GREEN
         case Log.DEBUG:
             foreground = Fore.LIGHTYELLOW_EX

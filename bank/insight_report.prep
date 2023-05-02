@@ -117,6 +117,7 @@
             
         </keepInFrame>
         <keepInFrame frame="monthlyContent">
+            <!-- TODO: Add more to this, for instance the last month's expenditure and how much of an increase/decrease it was compared to the month before, etc. -->
             <para style="textstyle1">
                 You spent an average of ${{"{:,}".format(month['avgPM'])}} per month. Your most expensive month was {{month['biggestMonth'].strftime("%B")}} where you spent ${{"{:,}".format(month['biggestMonthSpend'])}}.
             </para>
