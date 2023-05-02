@@ -16,7 +16,7 @@ class Log(Enum):
         return self.name.lower()
 
 
-def log(type: Log, message: str):
+def log(type: Log, message: str = None):
     init()
 
     foreground = Fore.RESET
@@ -36,7 +36,37 @@ def log(type: Log, message: str):
             foreground = Fore.RESET
 
     ts = dt.datetime.now().strftime("%m/%d %H:%M:%S")
+
     if type == Log.TRACE:
-        message = f"[{inspect.stack()[1][3]}]: " + message
+        trace = inspect.stack()
+        if message == None:
+            message = build_trace(trace)
+        else:
+            message = f"[{inspect.stack()[1][3]}]: " + message
 
     print(foreground + f"[{ts}] {type}: {message}" + Style.RESET_ALL)
+
+
+def build_trace(trace):
+    main_idx = 0
+    for i in range(len(trace)):
+        if trace[i][3].find("main") != -1:
+            main_idx = i
+            break
+        else:
+            continue
+
+    message = "["
+    itr = 1
+    for i in range(main_idx):
+        if i != 0:
+            message += f" <= {trace[itr][3]}"
+            itr += 1
+            continue
+
+        message += f"{trace[itr][3]}"
+        itr += 1
+
+    message += "]"
+
+    return message
