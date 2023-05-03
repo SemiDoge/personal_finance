@@ -7,11 +7,16 @@ from reportlab.lib.colors import PCMYKColor, toColor, Whiter
 from reportlab.lib.validators import Auto
 from rlextra.rml2pdf import rml2pdf
 
-from .functions import generate_monthly_insights, generate_time_info
+from .functions import generate_monthly_insights, generate_time_info, set_metadata
+from .enums import Bank
 
 
 def commit_to_pdf(
-    data: dict, outfile: str, statement: list[dict], verbose: bool = False
+    data: dict,
+    outfile: str,
+    statement: list[dict],
+    bank: Bank,
+    verbose: bool = False,
 ):
     data["period"] = generate_time_info(statement)
 
@@ -26,8 +31,15 @@ def commit_to_pdf(
         "tblBGAlt": "#F2F2F2",
     }
 
-    # bank_info = {"name": "Scotia", "bannerBG": "#EA0E18"}
-    bank_info = {"name": "BMO", "bannerBG": "#0173B5"}
+    match (bank):
+        case Bank.SCOTIA:
+            bank_info = {"name": "Scotia", "bannerBG": "#EA0E18"}
+        case Bank.BMO:
+            bank_info = {"name": "BMO", "bannerBG": "#0173B5"}
+        case Bank.TD:
+            bank_info = {"name": "TD Bank", "bannerBG": "#006E00"}
+        case _:
+            bank_info = {"name": "", "bannerBG": "#808080"}
 
     template = preppy.getModule("bank/insight_report.prep")
     rmlText = template.get(
@@ -35,6 +47,11 @@ def commit_to_pdf(
     )
 
     rml2pdf.go(rmlText, outputFileName=outfile)
+    set_metadata(
+        outfile,
+        title=f"Transaction Insights",
+        subject=f"This document summarizes transactions from ({data['period']['fTrnsDate'].strftime('%b %d, %Y')} to {data['period']['lTrnsDate'].strftime('%b %d, %Y')})",
+    )
 
 
 class AssetPie2dp(_DrawingEditorMixin, Drawing):

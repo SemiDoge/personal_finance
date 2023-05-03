@@ -6,6 +6,7 @@ import os
 import datetime as dt
 
 from .log import log, Log
+from .enums import Bank
 
 
 def generate_insights(categorizer: list[dict], statement: list[dict]):
@@ -77,12 +78,38 @@ def sum_category(category: str, filtered: list):
     return out
 
 
-def extract_timestamp(ts: str):
-    year = ts[0:4]
-    month = ts[4:6]
-    day = ts[6:8]
+def set_metadata(
+    file_path: str,
+    title: str = "Transaction Insights",
+    author: str = os.getlogin(),
+    subject: str = "This document summarizes transactions...",
+):
+    with open(file_path, "r") as file:
+        content = file.read()
 
-    return datetime.datetime(int(year), int(month), int(day))
+    content = re.sub(r"/Title \(.*?\)", f"/Title ({title})", content)
+    content = re.sub(r"/Author \(.*?\)", f"/Author ({author})", content)
+    content = re.sub(
+        r"/Subject \(.*?\)",
+        f"/Subject ({subject})",
+        content,
+    )
+    content = re.sub(r"/Producer \(.*?\)", f"/Producer (RML2PDF)", content)
+
+    with open(file_path, "w") as file:
+        file.write(content)
+
+
+def extract_timestamp(ts: str):
+    formats = ["%Y%m%d", "%m/%d/%Y"]
+
+    for format in formats:
+        try:
+            timestamp = dt.datetime.strptime(ts, format)
+            return timestamp
+        except ValueError:
+            pass
+    raise ValueError("Unable to parse timestamp string")
 
 
 def categorize(categorizer, transactionTitle: str):
@@ -159,7 +186,7 @@ def filter_months(statement):
     return out
 
 
-def slurp_statement_csv(categorizer, file: str, bForPrint: bool):
+def slurp_bmo_csv(categorizer, file: str, bForPrint: bool):
     records = []
 
     try:
@@ -197,6 +224,9 @@ def slurp_statement_csv(categorizer, file: str, bForPrint: bool):
                             transactionTitle=re.sub(r"\s{3,}", " ", row[4].rstrip()),
                         )
                     )
+    except ValueError as error:
+        log(Log.ERROR, f"{error}")
+        exit(-1)
     except PermissionError:
         log(
             Log.ERROR,
@@ -205,3 +235,70 @@ def slurp_statement_csv(categorizer, file: str, bForPrint: bool):
         exit(-1)
 
     return records
+
+
+def auto_detect_bank(file: str):
+    with open(file, "r", encoding="utf-8") as statement:
+        reader = csv.reader(statement, delimiter=",")
+
+        itr = next(reader)
+
+        if itr[0].find("Following") != -1:
+            return Bank.BMO
+        elif len(itr[0]) < 15:
+            return Bank.SCOTIA
+        else:
+            return Bank.NULL
+
+
+def slurp_scotia_csv(categorizer, file: str, bForPrint: bool):
+    records = []
+
+    try:
+        with open(file, "r", encoding="utf-8") as statement:
+            reader = csv.reader(statement, delimiter=",")
+
+            for row in reader:
+                if bForPrint == True:
+                    records.append(
+                        dict(
+                            transactionTimestamp=extract_timestamp(row[0]).strftime(
+                                "%Y/%m/%d"
+                            ),
+                            transactionAmount=float(row[1]),
+                            transactionType="CREDIT" if float(row[1]) > 0 else "DEBIT",
+                            transactionCategory=categorize(categorizer, row[4]),
+                            transactionTitle=re.sub(r"\s{3,}", " ", row[4].rstrip()),
+                        )
+                    )
+                else:
+                    records.append(
+                        dict(
+                            transactionTimestamp=extract_timestamp(row[0]),
+                            transactionType="CREDIT" if float(row[1]) > 0 else "DEBIT",
+                            transactionAmount=float(row[1]),
+                            transactionCategory=categorize(categorizer, row[4]),
+                            transactionTitle=re.sub(r"\s{3,}", " ", row[4].rstrip()),
+                        )
+                    )
+    except PermissionError:
+        log(
+            Log.ERROR,
+            f"User '{os.getlogin()}' does not have permissions to access file '{file}'",
+        )
+        exit(-1)
+
+    return records
+
+
+def slurp_statement_csv(categorizer, file: str, bForPrint: bool, bank: Bank):
+    if bank == Bank.BMO:
+        return slurp_bmo_csv(categorizer, file, bForPrint)
+    elif bank == Bank.SCOTIA:
+        # TODO: Raw data coming in from Scotiabank contains characters like an unmatched '(' or '&'
+        # which do not play well with XML. Some sanitization must be done in order to prevent this
+        return slurp_scotia_csv(categorizer, file, bForPrint)
+    elif bank == Bank.TD:
+        raise Exception(f"NOT IMPLEMENTED")
+    else:
+        raise Exception(f"Unknown bank: '{Bank}'")
