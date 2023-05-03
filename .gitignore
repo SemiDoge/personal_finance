@@ -3,6 +3,7 @@
 scrapes/
 bank/__pycache__/
 bank/scraper.py
+bank/config/categorizer_*
 
 *.json
 *.csv

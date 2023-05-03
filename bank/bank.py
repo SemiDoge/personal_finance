@@ -5,8 +5,9 @@ import os
 
 from .log import log, Log
 from .config import Configuration
-from .functions import slurp_statement_csv, generate_insights
+from .functions import slurp_statement_csv, generate_insights, auto_detect_bank
 from .pdf import commit_to_pdf
+from .enums import Bank
 
 
 def print_json(ctx, param, value):
@@ -18,7 +19,7 @@ def print_json(ctx, param, value):
             categorizer = config.get_categorizer()
             print(
                 json.dumps(
-                    slurp_statement_csv(categorizer, f"./{statement}", True),
+                    slurp_statement_csv(categorizer, f"./{statement}", True, Bank.BMO),
                     default=str,
                     indent=4,
                 )
@@ -48,15 +49,23 @@ def print_json(ctx, param, value):
     is_flag=True,
     callback=print_json,
 )
-def main(statement: str, print_json: bool, verbose: bool):
+@click.option(
+    "-c",
+    "--categorizer-path",
+    help="Path to categorizer .yaml you wish to use to categorize your transaction data. Only looks in config/ directory.",
+)
+def main(statement: str, print_json: bool, categorizer_path: str, verbose: bool):
     statement = statement.replace(" ", "")
     # TODO: Instead of only passing the categorizer around, maybe the entire configuration object should be sent so that other ...
     # configuration options can change the program. For example change the colour of the banner in the PDF, to fit the bank's colours.
-    config = Configuration(config_dir="bank/config")
+
+    bank = auto_detect_bank(statement)
+
+    config = Configuration(config_dir="bank/config", config=categorizer_path)
     categorizer = config.get_categorizer()
 
     try:
-        statement_obj = slurp_statement_csv(categorizer, statement, False)
+        statement_obj = slurp_statement_csv(categorizer, statement, False, bank)
     except FileNotFoundError as error:
         log(Log.ERROR, f"File '{error.filename}' not found!")
         return -1
@@ -67,11 +76,11 @@ def main(statement: str, print_json: bool, verbose: bool):
     try:
         if verbose == True:
             outfile = f"{outfile[:len(outfile)-4]}_detailed.pdf"
-            commit_to_pdf(insights_obj, outfile, statement_obj, True)
+            commit_to_pdf(insights_obj, outfile, statement_obj, bank, verbose=True)
         else:
-            commit_to_pdf(insights_obj, outfile, statement_obj)
+            commit_to_pdf(insights_obj, outfile, statement_obj, bank)
 
-        log(Log.INFO, f"Saved insight to {os.path.abspath(outfile)}")
+        log(Log.INFO, f"Saved insight report to {os.path.abspath(outfile)}")
         webbrowser.open(outfile)
     except IOError as error:
         log(Log.ERROR, f"Error creating or writing to file '{outfile}'")

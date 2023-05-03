@@ -8,8 +8,9 @@ from yaml.parser import ParserError
 
 
 class Configuration:
-    def __init__(self, config_dir: str):
-        self.categorizer_path = f"{config_dir}/categorizer.yaml"
+    def __init__(self, config_dir: str, config: str):
+        self.categorizer_file = config
+        self.categorizer_path = f"{config_dir}/{config}"
         self.categorizer = self.load_categorizer_config()
 
     def load_categorizer_config(self):
@@ -28,46 +29,52 @@ class Configuration:
             yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, create_categorizer_yaml
         )
 
-        with open(self.categorizer_path, "r") as f:
-            try:
+        try:
+            with open(self.categorizer_path, "r") as f:
                 categorizer = yaml.safe_load(f)
-            except FileNotFoundError:
-                log(Log.ERROR, f"Config file '{self.categorizer_path}' not found!")
+        except FileNotFoundError:
+            print(self.categorizer_file)
+            if self.categorizer_file is None:
+                log(Log.WARNING, f"Config file not provided!")
                 log(Log.WARNING, f"Using default categorizer. Continuing execution.")
-
                 return default_categorizer
-            except ParserError as error:
-                log(
-                    Log.ERROR,
-                    f"Invalid YAML contained in config file '{self.categorizer_path}': {error.context} {error.problem} near [{error.context_mark.line}, {error.context_mark.column}]",
-                )
-                log(Log.WARNING, f"Using default categorizer. Continuing execution.")
 
-                return default_categorizer
-            except ScannerError as error:
-                log(
-                    Log.ERROR,
-                    f"Invalid YAML contained in config file '{self.categorizer_path}': {error.context} {error.problem} near [{error.context_mark.line}, {error.context_mark.column}]",
-                )
-                log(Log.WARNING, f"Using default categorizer. Continuing execution.")
+            log(Log.ERROR, f"Config file '{self.categorizer_path}' not found!")
+            log(Log.WARNING, f"Using default categorizer. Continuing execution.")
 
-                return default_categorizer
-            except ConstructorError as error:
-                log(
-                    Log.ERROR,
-                    f"Invalid config file '{self.categorizer_path}' reason: {error}",
-                )
-                log(Log.WARNING, f"Using default categorizer. Continuing execution.")
+            return default_categorizer
+        except ParserError as error:
+            log(
+                Log.ERROR,
+                f"Invalid YAML contained in config file '{self.categorizer_path}': {error.context} {error.problem} near [{error.context_mark.line}, {error.context_mark.column}]",
+            )
+            log(Log.WARNING, f"Using default categorizer. Continuing execution.")
 
-                return default_categorizer
-            except PermissionError:
-                log(
-                    Log.ERROR,
-                    f"User '{os.getlogin()}' does not have permissions to access file '{self.categorizer_path}'",
-                )
-                log(Log.WARNING, f"Using default categorizer. Continuing execution.")
+            return default_categorizer
+        except ScannerError as error:
+            log(
+                Log.ERROR,
+                f"Invalid YAML contained in config file '{self.categorizer_path}': {error.context} {error.problem} near [{error.context_mark.line}, {error.context_mark.column}]",
+            )
+            log(Log.WARNING, f"Using default categorizer. Continuing execution.")
 
-                return default_categorizer
+            return default_categorizer
+        except ConstructorError as error:
+            log(
+                Log.ERROR,
+                f"Invalid config file '{self.categorizer_path}' reason: {error}",
+            )
+            log(Log.WARNING, f"Using default categorizer. Continuing execution.")
+
+            return default_categorizer
+        except PermissionError:
+            log(
+                Log.ERROR,
+                f"User '{os.getlogin()}' does not have permissions to access file '{self.categorizer_path}'",
+            )
+            log(Log.WARNING, f"Using default categorizer. Continuing execution.")
+
+            return default_categorizer
 
         return categorizer
 
