@@ -1,4 +1,4 @@
-{{def(data, colours, month, verbose, bank)}}
+{{def(data, colours, verbose)}}
 <!DOCTYPE document SYSTEM "rml.dtd">
 
 {{script}}
@@ -18,11 +18,11 @@
     <template>
         <pageTemplate id="main">
             <pageGraphics>
-                <fill color="{{bank['bannerBG']}}"/>
+                <fill color="{{data['bank']['bannerBG']}}"/>
                 <rect x="10" y="735" width="575" height="70" fill="yes" stroke="no"/> 
                 <fill color="{{colours['bannerFG']}}"/>
                 <setFont name="Helvetica" size="24"/>
-                <drawRightString x="578" y="742">{{bank["name"]}}</drawRightString>
+                <drawRightString x="578" y="742">{{data['bank']['name']}}</drawRightString>
                 <drawString x="45" y="775">Transaction Insights</drawString>
                 <setFont name="Helvetica" size="14"/>
                 <fill color="{{colours['stdFG']}}"/>
@@ -39,7 +39,7 @@
         </pageTemplate>
         <pageTemplate id="transactions">
             <pageGraphics>
-                <fill color="{{bank['bannerBG']}}"/>
+                <fill color="{{data['bank']['bannerBG']}}"/>
                 <rect x="10" y="735" width="575" height="70" fill="yes" stroke="no"/> 
                 <fill color="{{colours['bannerFG']}}"/>
                 <setFont name="Helvetica" size="24"/>
@@ -71,7 +71,7 @@
             <blockAlignment value="right" start="0,1" stop="0,-1"/>
             <blockAlignment value="center" start="0,0" stop="1,0"/>
             <blockAlignment value="center" start="1,1" stop="-1,-1"/>
-            <blockBackground colorName="{{bank['bannerBG']}}" start="0,0" stop="-1,0"/>
+            <blockBackground colorName="{{data['bank']['bannerBG']}}" start="0,0" stop="-1,0"/>
             <blockFont name="Helvetica" size="12" start="0,0" stop="-1,0"/>
             <blockFont name="Helvetica-Bold" start="0,1" stop="0,-1"/>
             <blockTextColor colorName="white" start="0,0" stop="-1,0"/>
@@ -83,7 +83,7 @@
             <blockAlignment value="right" start="0,1" stop="0,-1"/>
             <blockAlignment value="center" start="0,0" stop="1,0"/>
             <blockAlignment value="center" start="1,1" stop="-1,-1"/>
-            <blockBackground colorName="{{bank['bannerBG']}}" start="0,0" stop="-1,0"/>
+            <blockBackground colorName="{{data['bank']['bannerBG']}}" start="0,0" stop="-1,0"/>
             <blockFont name="Helvetica" size="12" start="0,0" stop="-1,0"/>
             <blockFont name="Helvetica-Bold" start="0,1" stop="0,-1"/>
             <blockTextColor colorName="white" start="0,0" stop="-1,0"/>
@@ -120,7 +120,7 @@
         <keepInFrame frame="monthlyContent">
             <!-- TODO: Add more to this, for instance the last month's expenditure and how much of an increase/decrease it was compared to the month before, etc. -->
             <para style="textstyle1">
-                You spent an average of ${{"{:,}".format(month['avgPM'])}} per month. Your most expensive month was {{month['biggestMonth'].strftime("%B")}} where you spent ${{"{:,}".format(month['biggestMonthSpend'])}}.
+                You spent an average of ${{"{:,}".format(data['month']['avgPM'])}} per month. Your most expensive month was {{data['month']['biggestMonth'].strftime("%B")}} where you spent ${{"{:,}".format(data['month']['biggestMonthSpend'])}}.
             </para>
         </keepInFrame>
         <keepInFrame frame="spendingPieChart">
