@@ -15,15 +15,15 @@ Currently the insights are:
 ```
 Usage: python -m bank [OPTIONS]
 
-  Takes a BMO generated transaction .csv file and interprets that data to
-  provide insights in the form of a viewable PDF.
+  Takes a BMO or Scotiabank generated transaction .csv file and interprets    
+  that data to provide insights in the form of a viewable PDF.
 
 Options:
-  -s, --statement TEXT         Bank statement csv filename.
-  -v, --verbose                Includes itemized transactions along with 
+  -s, --statement TEXT         Path to bank statement .csv filename.        
+  -v, --verbose                Includes itemized transactions along with      
                                insights PDF.
-  -p, --print-json             Prints pretty JSON (alternate to PDF).    
-  -c, --categorizer-path TEXT  Path to categorizer .yaml you wish to use to
+  -p, --print-json             Prints pretty JSON (alternate to PDF).
+  -c, --categorizer-path TEXT  Path to categorizer .yaml you wish to use to   
                                categorize your transaction data. Only looks in
                                config/ directory.
   -h, --help                   Show this message and exit.

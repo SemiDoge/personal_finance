@@ -31,10 +31,12 @@ def print_json(ctx, param, value):
 
 
 @click.command(
-    help="Takes a BMO generated transaction .csv file and interprets that data to provide insights in the form of a viewable PDF.",
+    help="Takes a BMO or Scotiabank generated transaction .csv file and interprets that data to provide insights in the form of a viewable PDF.",
     context_settings=dict(help_option_names=["-h", "--help"]),
 )
-@click.option("-s", "--statement", prompt=True, help="Bank statement csv filename.")
+@click.option(
+    "-s", "--statement", prompt=True, help="Path to bank statement `.csv` filename."
+)
 @click.option(
     "-v",
     "--verbose",
