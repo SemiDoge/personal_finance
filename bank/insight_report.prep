@@ -104,15 +104,15 @@
             <blockTable style="tblTopline">
             <tr>
                 <td>Money spent YTD</td>
-                <td leftPadding="15" align="DECIMAL">${{"{:,}".format(abs(data['totMoneyOut']))}}</td>
+                <td leftPadding="15" align="DECIMAL">${{"{:,.2f}".format(abs(data['totMoneyOut']))}}</td>
             </tr>
             <tr>
                 <td>Money recieved YTD</td>
-                <td leftPadding="15" align="DECIMAL">${{"{:,}".format(data['totMoneyIn'])}}</td>
+                <td leftPadding="15" align="DECIMAL">${{"{:,.2f}".format(data['totMoneyIn'])}}</td>
             </tr>
             <tr>
                 <td>Net Money YTD</td>
-                <td leftPadding="15" align="DECIMAL">${{"{:,}".format(data['totDifference'])}}</td>
+                <td leftPadding="15" align="DECIMAL">${{"{:,.2f}".format(data['totDifference'])}}</td>
             </tr>
             </blockTable>
             
@@ -120,7 +120,7 @@
         <keepInFrame frame="monthlyContent">
             <!-- TODO: Add more to this, for instance the last month's expenditure and how much of an increase/decrease it was compared to the month before, etc. -->
             <para style="textstyle1">
-                You spent an average of ${{"{:,}".format(data['month']['avgPM'])}} per month. Your most expensive month was {{data['month']['biggestMonth'].strftime("%B")}} where you spent ${{"{:,}".format(data['month']['biggestMonthSpend'])}}.
+                You spent an average of ${{"{:,.2f}".format(data['month']['avgPM'])}} per month. Your most expensive month was {{data['month']['biggestMonth'].strftime("%B")}} where you spent ${{"{:,}".format(data['month']['biggestMonthSpend'])}}.
             </para>
         </keepInFrame>
         <keepInFrame frame="spendingPieChart">
