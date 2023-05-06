@@ -29,11 +29,36 @@ Options:
   -h, --help                   Show this message and exit.
 ```
 
+## Statement
+
+This program accepts a `.csv` representing the transactions of a bank account. This kind of information can be downloaded from a bank. Unfortunately, due to the nature of different banks formatting their data differently this program only supports transaction data originating from Bank of Montreal and Scotiabank.
+
+### BMO
+``` csv
+1:Following data is valid as of 20230113000000 (Year/Month/Day/Hour/Minute/Second)
+2:
+3:
+4:First Bank Card,Transaction Type,Date Posted, Transaction Amount,Description
+5:
+6:
+7:'${CARD_NUMBER}',${TRANSACTION_TYPE},20230113,-1.00,${TRANSACTION_DESCRIPTION}
+8+:...
+```
+
+Line numbers included to make `.csv` structure more explicit. Don't include numbers when actually using program.
+
+### Scotiabank
+``` csv
+1:x/xx/2023,-1.00,-,"${TRANSACTION_TYPE}","${TRANSACTION_DESCRIPTION}"
+2+:...
+```
+
+
 ## Categorizer
 
-The categorizer is a part of the program that interprets the bank's 'transaction title' and makes a determination on how any given transaction should be categorized. You can make your own categorizer by providing a `config/categorizer.yaml` config file that the program will read and use to guide the categorizer's behaviour.
+The categorizer is a part of the program that interprets the bank's 'transaction description' and makes a determination on how any given transaction should be categorized. You can make your own categorizer by providing a `config/categorizer.yaml` config file that the program will read and use to guide the categorizer's behaviour.
 
-The order in which categories and search strings are placed in the file is important. If a transaction title could fit under multiple categories it will be categorized into the category with the higher position in the config file.
+The order in which categories and search strings are placed in the file is important. If a transaction description could fit under multiple categories it will be categorized into the category with the higher position in the config file.
 
 Below is what the default categorizer looks like as a `.yaml` file.
 
