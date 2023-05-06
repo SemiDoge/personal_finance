@@ -194,8 +194,6 @@ def slurp_bmo_csv(categorizer, file: str, bForPrint: bool):
             reader = csv.reader(statement, delimiter=",")
 
             # Skip junk starting lines
-            # TODO: Replace this with a system to enforce a certain format (maybe in it's own function)
-            # Raise a CSVFormatError exception
             for i in range(6):
                 next(reader)
 
