@@ -84,7 +84,7 @@ def set_metadata(
     author: str = os.getlogin(),
     subject: str = "This document summarizes transactions...",
 ):
-    with open(file_path, "r") as file:
+    with open(file_path, "r", encoding='ISO-8859-1') as file:
         content = file.read()
 
     content = re.sub(r"/Title \(.*?\)", f"/Title ({title})", content)
@@ -96,7 +96,7 @@ def set_metadata(
     )
     content = re.sub(r"/Producer \(.*?\)", f"/Producer (RML2PDF)", content)
 
-    with open(file_path, "w") as file:
+    with open(file_path, "w", encoding="ISO-8859-1") as file:
         file.write(content)
 
 

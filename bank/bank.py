@@ -61,12 +61,11 @@ def main(statement: str, print_json: bool, categorizer_path: str, verbose: bool)
     # TODO: Instead of only passing the categorizer around, maybe the entire configuration object should be sent so that other ...
     # configuration options can change the program. For example change the colour of the banner in the PDF, to fit the bank's colours.
 
-    bank = auto_detect_bank(statement)
-
     config = Configuration(config_dir="bank/config", config=categorizer_path)
     categorizer = config.get_categorizer()
 
     try:
+        bank = auto_detect_bank(statement)
         statement_obj = slurp_statement_csv(categorizer, statement, False, bank)
     except FileNotFoundError as error:
         log(Log.ERROR, f"File '{error.filename}' not found!")

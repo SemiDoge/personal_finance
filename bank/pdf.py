@@ -8,6 +8,7 @@ from reportlab.lib.validators import Auto
 from rlextra.rml2pdf import rml2pdf
 
 from .functions import generate_monthly_insights, generate_time_info, set_metadata
+from .log import log, Log
 from .enums import Bank
 
 
@@ -48,11 +49,14 @@ def commit_to_pdf(
     rmlText = template.get(data, colours, verbose)
 
     rml2pdf.go(rmlText, outputFileName=outfile)
-    set_metadata(
-        outfile,
-        title=f"Transaction Insights",
-        subject=f"This document summarizes transactions from ({data['period']['fTrnsDate'].strftime('%b %d, %Y')} to {data['period']['lTrnsDate'].strftime('%b %d, %Y')})",
-    )
+    try:
+        set_metadata(
+            outfile,
+            title=f"Transaction Insights",
+            subject=f"This document summarizes transactions from ({data['period']['fTrnsDate'].strftime('%b %d, %Y')} to {data['period']['lTrnsDate'].strftime('%b %d, %Y')})",
+        )
+    except UnicodeDecodeError as error:
+        log(Log.WARNING, f"Could not set metadata, reason: {error}")
 
 
 class AssetPie2dp(_DrawingEditorMixin, Drawing):
