@@ -6,8 +6,6 @@
     today = dt.datetime.today()
     today = today.strftime("%b %d/%Y")
 
-    idx = len(data['monthToMonthExpenditure'])
-
     # Defining variables that can be used across the template
     maxTitleLen = 50
     first = data['period']['fTrnsDate'].strftime("%b %d, %Y")

@@ -17,9 +17,10 @@ def print_json(ctx, param, value):
         try:
             config = Configuration(config_dir="bank/config", config=ctx.params["categorizer_path"].replace(" ",""))
             categorizer = config.get_categorizer()
+            bank = auto_detect_bank(statement)
             print(
                 json.dumps(
-                    slurp_statement_csv(categorizer, f"./{statement}", True, Bank.BMO),
+                    slurp_statement_csv(categorizer, f"./{statement}", True, bank),
                     default=str,
                     indent=4,
                 )
