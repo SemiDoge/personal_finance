@@ -13,6 +13,8 @@
     first = data['period']['fTrnsDate'].strftime("%b %d, %Y")
     last = data['period']['lTrnsDate'].strftime("%b %d, %Y")
     period = f"{first} to {last}"
+    #print(data['quarterlyExpenditure'])
+    quarters = len(data['quarterlyExpenditure'])
 {{endscript}}
 <document filename="x.pdf">
     <template>
@@ -121,6 +123,13 @@
             <!-- TODO: Add more to this, for instance the last month's expenditure and how much of an increase/decrease it was compared to the month before, etc. -->
             <para style="textstyle1">
                 You spent an average of ${{"{:,.2f}".format(data['month']['avgPM'])}} per month. Your most expensive month was {{data['month']['biggestMonth'].strftime("%B")}} where you spent ${{"{:,}".format(data['month']['biggestMonthSpend'])}}.
+            </para>
+            <para style="textstyle1">
+                {{if quarters > 1:}}
+                    Last quarter ({{data['quarterlyExpenditure'][quarters-2]['category']}}) you spent a total ${{"{:,.2f}".format(abs(data['quarterlyExpenditure'][quarters-2]['categoryMoneyOut']))}}.
+                {{endif}}
+            
+                In the current quarter ({{data['quarterlyExpenditure'][quarters-1]['category']}}) you spent an total of ${{"{:,.2f}".format(abs(data['quarterlyExpenditure'][quarters-1]['categoryMoneyOut']))}}.
             </para>
         </keepInFrame>
         <keepInFrame frame="spendingPieChart">

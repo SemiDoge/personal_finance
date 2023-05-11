@@ -6,7 +6,7 @@ import os
 import datetime as dt
 
 from .log import log, Log
-from .enums import Bank
+from .enums import Bank, Quarter
 
 
 def generate_insights(categorizer: list[dict], statement: list[dict]):
@@ -18,6 +18,7 @@ def generate_insights(categorizer: list[dict], statement: list[dict]):
 
     out["categoryExpenditure"] = filter_categories(categorizer, statement)
     out["monthToMonthExpenditure"] = filter_months(statement)
+    out["quarterlyExpenditure"] = filter_quarters(statement)
 
     return out
 
@@ -37,6 +38,19 @@ def generate_monthly_insights(data: dict):
 
     return month
 
+def determine_quarter(ts):
+    year = ts.year
+
+    if dt.datetime.strptime(f"{year}-01-01", "%Y-%m-%d") <= ts <= dt.datetime.strptime(f"{year}-03-31", "%Y-%m-%d"):
+        return Quarter.Q1
+    elif dt.datetime.strptime(f"{year}-04-01", "%Y-%m-%d") <= ts <= dt.datetime.strptime(f"{year}-06-30", "%Y-%m-%d"):
+        return Quarter.Q2
+    elif dt.datetime.strptime(f"{year}-07-01", "%Y-%m-%d") <= ts <= dt.datetime.strptime(f"{year}-09-30", "%Y-%m-%d"): 
+        return Quarter.Q3
+    elif dt.datetime.strptime(f"{year}-10-01", "%Y-%m-%d") <= ts <= dt.datetime.strptime(f"{year}-12-31", "%Y-%m-%d"): 
+        return Quarter.Q4
+    else:
+        raise Exception("Unreachable")
 
 def generate_time_info(statement):
     time = {}
@@ -157,6 +171,30 @@ def filter_categories(categorizer: list[dict], statement):
     return out
 
 
+def filter_quarters(statement):
+    quarter_trans = []
+    out = []
+
+    quarter_trans.append([{**record} for record in statement if record["transactionQuarter"] == Quarter.Q1])
+    quarter_trans.append([{**record} for record in statement if record["transactionQuarter"] == Quarter.Q2])
+    quarter_trans.append([{**record} for record in statement if record["transactionQuarter"] == Quarter.Q3])
+    quarter_trans.append([{**record} for record in statement if record["transactionQuarter"] == Quarter.Q4])
+
+    # removes empty/future months
+    for i in range(len(quarter_trans)):
+        if len(quarter_trans[i]) > 0:
+            out.append(
+                sum_category(
+                    str(quarter_trans[i][0]["transactionQuarter"]),
+                    quarter_trans[i],
+                )
+            )
+        else:
+            continue
+
+    return out
+
+
 def filter_months(statement):
     month_dicts = []
     out = []
@@ -199,27 +237,30 @@ def slurp_bmo_csv(categorizer, file: str, bForPrint: bool):
 
             for row in reader:
                 if bForPrint == True:
+                    timestamp = extract_timestamp(row[2])
+                    pretty_timestamp = timestamp.strftime("%Y-%m-%d")
                     records.append(
                         dict(
                             account=row[0].replace("'", ""),
                             transactionType=row[1],
-                            transactionTimestamp=extract_timestamp(row[2]).strftime(
-                                "%Y-%m-%d"
-                            ),
+                            transactionTimestamp=pretty_timestamp,
                             transactionAmount=float(row[3]),
                             transactionCategory=categorize(categorizer, row[4]),
                             transactionTitle=re.sub(r"\s{3,}", " ", row[4].rstrip()),
+                            transactionQuarter=determine_quarter(timestamp),
                         )
                     )
                 else:
+                    timestamp = extract_timestamp(row[2]) 
                     records.append(
                         dict(
                             account=row[0].replace("'", ""),
                             transactionType=row[1],
-                            transactionTimestamp=extract_timestamp(row[2]),
+                            transactionTimestamp=timestamp,
                             transactionAmount=float(row[3]),
                             transactionCategory=categorize(categorizer, row[4]),
                             transactionTitle=re.sub(r"\s{3,}", " ", row[4].rstrip()),
+                            transactionQuarter=determine_quarter(timestamp),
                         )
                     )
     except ValueError as error:
@@ -258,25 +299,28 @@ def slurp_scotia_csv(categorizer, file: str, bForPrint: bool):
 
             for row in reader:
                 if bForPrint == True:
+                    timestamp = extract_timestamp(row[0])
+                    pretty_timestamp = timestamp.strftime("%Y/%m/%d")
                     records.append(
                         dict(
-                            transactionTimestamp=extract_timestamp(row[0]).strftime(
-                                "%Y/%m/%d"
-                            ),
+                            transactionTimestamp= pretty_timestamp,
                             transactionAmount=float(row[1]),
                             transactionType="CREDIT" if float(row[1]) > 0 else "DEBIT",
                             transactionCategory=categorize(categorizer, row[4]),
                             transactionTitle=re.sub(r"\s{3,}", " ", row[4].rstrip()),
+                            transactionQuarter=determine_quarter(timestamp),
                         )
                     )
                 else:
+                    timestamp = extract_timestamp(row[0]) 
                     records.append(
                         dict(
-                            transactionTimestamp=extract_timestamp(row[0]),
+                            transactionTimestamp=timestamp,
                             transactionType="CREDIT" if float(row[1]) > 0 else "DEBIT",
                             transactionAmount=float(row[1]),
                             transactionCategory=categorize(categorizer, row[4]),
                             transactionTitle=re.sub(r"\s{3,}", " ", row[4].rstrip()),
+                            transactionQuarter=determine_quarter(timestamp),
                         )
                     )
     except PermissionError:
