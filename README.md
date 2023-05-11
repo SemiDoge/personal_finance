@@ -9,6 +9,7 @@ Currently the insights are:
   * Categorized money in, out, and net
     * Categorizations can be defined in categorizer.yaml file
   * Monthly money in, out, and net
+  * Current and previous quarter money out
 
 ## Use
 
