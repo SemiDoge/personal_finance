@@ -15,7 +15,7 @@ def print_json(ctx, param, value):
 
     if value == True:
         try:
-            config = Configuration(config_dir="bank/config")
+            config = Configuration(config_dir="bank/config", config=ctx.params["categorizer_path"].replace(" ",""))
             categorizer = config.get_categorizer()
             print(
                 json.dumps(
