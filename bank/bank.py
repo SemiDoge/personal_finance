@@ -7,7 +7,6 @@ from .log import log, Log
 from .config import Configuration
 from .functions import slurp_statement_csv, generate_insights, auto_detect_bank
 from .pdf import commit_to_pdf
-from .enums import Bank
 
 
 def print_json(ctx, param, value):
@@ -15,7 +14,10 @@ def print_json(ctx, param, value):
 
     if value == True:
         try:
-            config = Configuration(config_dir="bank/config", config=ctx.params["categorizer_path"].replace(" ",""))
+            config = Configuration(
+                config_dir="bank/config",
+                config=ctx.params["categorizer_path"].replace(" ", ""),
+            )
             categorizer = config.get_categorizer()
             bank = auto_detect_bank(statement)
             print(
