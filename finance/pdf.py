@@ -45,7 +45,7 @@ def commit_to_pdf(
     data["bank"] = bank_info
     data["month"] = generate_monthly_insights(data)
 
-    template = preppy.getModule("bank/insight_report.prep")
+    template = preppy.getModule("finance/insight_report.prep")
     rmlText = template.get(data, colours, verbose)
 
     rml2pdf.go(rmlText, outputFileName=outfile)

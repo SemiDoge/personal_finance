@@ -15,7 +15,7 @@ def print_json(ctx, param, value):
     if value == True:
         try:
             config = Configuration(
-                config_dir="bank/config",
+                config_dir="finance/config",
                 config=ctx.params["categorizer_path"].replace(" ", ""),
             )
             categorizer = config.get_categorizer()
@@ -64,7 +64,7 @@ def main(statement: str, print_json: bool, categorizer_path: str, verbose: bool)
     # TODO: Instead of only passing the categorizer around, maybe the entire configuration object should be sent so that other ...
     # configuration options can change the program. For example change the colour of the banner in the PDF, to fit the bank's colours.
 
-    config = Configuration(config_dir="bank/config", config=categorizer_path)
+    config = Configuration(config_dir="finance/config", config=categorizer_path)
     categorizer = config.get_categorizer()
 
     try:
