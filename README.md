@@ -1,5 +1,5 @@
-# banking
-
+# Personal Finance
+## Overview
 This is a Python CLI application that will take a `.csv` finance statement and provide insights about the data.
 
 Currently the insights are:
@@ -10,6 +10,20 @@ Currently the insights are:
     * Categorizations can be defined in categorizer.yaml file
   * Monthly money in, out, and net
   * Current and previous quarter money out
+
+## Prerequisites
+
+* Python3
+* pip
+
+## Getting Started
+
+* Clone the repository.
+* Enter the cloned repo.
+* Run: `python -m venv .venv` to create a virtual environment.
+* Run: `pip install -r ./requirements.txt` to install the requirements.
+
+The application is now ready to use!
 
 ## Use
 
