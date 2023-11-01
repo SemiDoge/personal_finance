@@ -246,7 +246,7 @@ def slurp_bmo_csv(categorizer, file: str, bForPrint: bool):
                             transactionTimestamp=pretty_timestamp,
                             transactionAmount=float(row[3]),
                             transactionCategory=categorize(categorizer, row[4]),
-                            transactionTitle=re.sub(r"\s{3,}", " ", row[4].rstrip()),
+                            transactionTitle=re.sub(r"\&", " ", re.sub(r"\s{3,}", " ", row[4].rstrip())),
                             transactionQuarter=determine_quarter(timestamp),
                         )
                     )
@@ -259,7 +259,7 @@ def slurp_bmo_csv(categorizer, file: str, bForPrint: bool):
                             transactionTimestamp=timestamp,
                             transactionAmount=float(row[3]),
                             transactionCategory=categorize(categorizer, row[4]),
-                            transactionTitle=re.sub(r"\s{3,}", " ", row[4].rstrip()),
+                            transactionTitle=re.sub(r"\&", " ", re.sub(r"\s{3,}", " ", row[4].rstrip())),
                             transactionQuarter=determine_quarter(timestamp),
                         )
                     )
