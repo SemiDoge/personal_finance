@@ -70,7 +70,7 @@ def main(statement: str, print_json: bool, categorizer_path: str, verbose: bool)
         statement_obj = slurp_statement_csv(categorizer, statement, False, bank)
     except FileNotFoundError as error:
         log(Log.ERROR, f"File '{error.filename}' not found!")
-        return -1
+        exit(-1)
 
     insights_obj = generate_insights(categorizer, statement_obj)
 
@@ -86,6 +86,6 @@ def main(statement: str, print_json: bool, categorizer_path: str, verbose: bool)
         webbrowser.open(outfile)
     except IOError as error:
         log(Log.ERROR, f"Error creating or writing to file '{outfile}'")
-        return
+        exit(-1)
 
     return
