@@ -1,4 +1,4 @@
-from .bank import main
+from .finance import main
 
 if __name__ == "__main__":
     main()

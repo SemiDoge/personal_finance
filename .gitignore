@@ -1,9 +1,9 @@
 .venv/
 .vscode/
 scrapes/
-bank/__pycache__/
-bank/scraper.py
-bank/config/categorizer_*
+finance/__pycache__/
+finance/scraper.py
+finance/config/categorizer_*
 
 *.json
 *.csv

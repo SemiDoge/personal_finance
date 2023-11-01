@@ -131,7 +131,7 @@
             </para>
         </keepInFrame>
         <keepInFrame frame="spendingPieChart">
-            <drawing module="bank.assets_pie" function="AssetPie2dp">
+            <drawing module="finance.assets_pie" function="AssetPie2dp">
                 <param name = "pie.data">{{[(cat['categoryMoneyOut'])/data['totMoneyOut'] for cat in data['categoryExpenditure'] if cat['categoryMoneyOut'] != 0]}}</param>
                 <param name = "_labels">{{[cat['category'] for cat in data['categoryExpenditure'] if cat['categoryMoneyOut']]}}</param>
             </drawing>

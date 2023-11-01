@@ -1,6 +1,6 @@
-# banking
-
-This is a Python CLI application that will take a `.csv` bank statement and provide insights about the data.
+# Personal Finance
+## Overview
+This is a Python CLI application that will take a `.csv` finance statement and provide insights about the data.
 
 Currently the insights are:
   * Total / YTD money out
@@ -11,10 +11,24 @@ Currently the insights are:
   * Monthly money in, out, and net
   * Current and previous quarter money out
 
+## Prerequisites
+
+* Python3
+* pip
+
+## Getting Started
+
+* Clone the repository.
+* Enter the cloned repo.
+* Run: `python -m venv .venv` to create a virtual environment.
+* Run: `pip install -r ./requirements.txt` to install the requirements.
+
+The application is now ready to use!
+
 ## Use
 
 ```
-Usage: python -m bank [OPTIONS]
+Usage: python -m finance [OPTIONS]
 
   Takes a BMO or Scotiabank generated transaction .csv file and interprets    
   that data to provide insights in the form of a viewable PDF.

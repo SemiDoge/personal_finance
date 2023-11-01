@@ -33,7 +33,7 @@ class Configuration:
             with open(self.categorizer_path, "r") as f:
                 categorizer = yaml.safe_load(f)
         except FileNotFoundError:
-            print(self.categorizer_file)
+            print(self.categorizer_path)
             if self.categorizer_file is None:
                 log(Log.WARNING, f"Config file not provided!")
                 log(Log.WARNING, f"Using default categorizer. Continuing execution.")
