@@ -25,6 +25,12 @@ Currently the insights are:
 
 The application is now ready to use!
 
+## Demonstration
+
+[Demonstration PDF](./demo/demo.pdf)
+
+[Demonstration README](./demo/README.md)
+
 ## Use
 
 ```

@@ -1,0 +1,85 @@
+- category: Subscriptions
+  strings:
+    - RECURRING
+
+- category: Refunds
+  strings:
+    - REFUND
+
+- category: Government/Taxes
+  strings:
+    - ' GST/'
+    - ' PRO/'
+    - ' FED/'
+    - CRA
+    - GOV CA
+    - 'CANADA '
+  
+- category: Income
+  strings:
+    - PAYROLL
+
+- category: Investments
+  strings:
+    - CHICKAPEE
+    - DIVIDEND
+
+- category: Transfers
+  strings:
+    - ETRNSFR
+    - RECVD
+    - 'TF '
+    - TRNSFR
+  
+- category: Restaurants
+  strings:
+    - GRILL
+    - COFFEE
+    - BITE
+    - GRUB
+    - FAST FOOD
+    - PIZZA
+    - BURGER
+
+- category: Grocery
+  strings:
+    - GROCERY
+    - MARKET
+    - MART
+
+- category: Gas
+  strings:
+    - STANDARD OIL
+
+- category: Books
+  strings:
+    - BOOK
+
+- category: Electronics 
+  strings:
+    - ELECTRONICS
+
+- category: Amusement
+  strings: 
+    - MOVIE
+    - THEATRE
+
+- category: Automobile
+  strings:
+    - TIRE
+
+- category: Tools/Handiness
+  strings:
+    - TOOLS
+    - HARDWARE
+
+- category: Clothing
+  strings:
+    - FASHION
+    - STYLE
+    - THREADS
+    - CHIC
+
+- category: Online/Others
+  strings:
+    - ONLINE
